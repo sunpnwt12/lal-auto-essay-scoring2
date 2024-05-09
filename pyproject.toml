@@ -1,0 +1,35 @@
+[project]
+name = "lal-auto-essay-scoring2"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "sunpnwt12", email = "sun.punnawit@gmail.com" }
+]
+dependencies = [
+    "numpy>=1.26.4",
+    "pandas>=2.2.2",
+    "matplotlib>=3.8.4",
+    "torch>=2.3.0",
+    "transformers==4.39.3",
+    "scikit-learn>=1.4.2",
+    "lightgbm>=4.3.0",
+    "pyspellchecker>=0.8.1",
+    "polars>=0.20.22",
+    "seaborn>=0.13.2",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lal_auto_essay_scoring2"]
