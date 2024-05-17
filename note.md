@@ -578,19 +578,19 @@
     - on kaggle samples split using StratifiedGropuKFold
     - on NOL persuade split using StratifiedFold on score
         - on each fold still has similar score distribution
-    
-    - testing this idea
-        - **exp043**:
-            - [RESULT] fold0 CV: 0.8213, LB: 0.789
-            - there were overlapping data this CV can be invalid because there might be some leakage
-        - **exp044**: fixed exp043
-            - [RESULT] fold0 CV: 0.7947, LB: 0.790
-            - [RESULT] fold1 CV: 0.7621, LB: 0.797
-            - [RESULT] fold2 CV: 0.7534, LB: 0.785
-            - [RESULT] fold3 CV: 0.5923, LB: 0.774
-            - [RESULT] oof 4fold CV: 0.7461, LB: 
-        - **exp045**: this time use both StratifiedKFold on two dataset
-            - [RESULT] fold0 CV: 0.8200, LB: 0.796
+   
+ >   - testing this idea
+ >       - **exp043**:
+ >           - [RESULT] fold0 CV: 0.8213, LB: 0.789
+ >           - there were overlapping data this CV can be invalid because there might be some leakage
+ >       - **exp044**: fixed exp043
+ >           - [RESULT] fold0 CV: 0.7947, LB: 0.790
+ >           - [RESULT] fold1 CV: 0.7621, LB: 0.797
+ >           - [RESULT] fold2 CV: 0.7534, LB: 0.785
+ >           - [RESULT] fold3 CV: 0.5923, LB: 0.774
+ >           - [RESULT] oof 4fold CV: 0.7461, LB: 
+ >       - **exp045**: this time use both StratifiedKFold on two dataset
+ >           - [RESULT] fold0 CV: 0.8200, LB: 0.796
 
 - try 7 fold on groupkfold
 
@@ -609,11 +609,441 @@
 >
 > where P is full pursuade corpus.
 
-- **exp046**: setup new CV scheme
-    - follow the above method
-    - score is from 1st epoch
-    - P in is exp is only persuade the overlapping with default training set
-    - [RESULT] fold0 CV: 0.7820, LB: 0.768
+>- **exp046**: setup new CV scheme
+>    - follow the above method
+>    - score is from 1st epoch
+>    - P in this exp is only persuade that overlapping with default training set
+>    - [RESULT] fold0 CV: 0.7820, LB: 0.768
+>    - from 1st epoch
 
+>- **exp047**: 
+>    - based: exp046
+>    - still using kaggle-only data as validation datset
+>    - this exp added extra data from persuade 2.0 that does not appear in default dataset splited 
+>    - also, how training set mix is a bit unusual
+>        - training set is splited then splited persuade dataset was added
+>    - [RESULT] fold0 CV: 0.7808, LB: 0.778
+>    - from 2nd epoch
+
+>- **exp048**:
+>    - based: exp047
+>    - same setup this time with base model
+>    - [RESULT] fold0 CV: 0.7765, LB: 0.792
+>    - from the last epoch
+
+>- **exp049**: change decoder_lr to 2e-5
+>    - based: exp047
+>    - small model
+>    - [RESULT] fold0 CV: 0.7774, LB: 0.775
+>    - does not help
+
+>- **exp050**:
+>    - try LLRD
+>    - stick to this as it show a good correlation, see if cv goes up, will LB up too
+>    - this training get worse at 2nd epoch
+>    - based: exp047
+>    - [RESULT] fold0 CV: 0.7761, LB: 0.793
+>    - from the last epoch
 
 - by using kaggle-only data as validation set, cv can be calculated more aligned with test dataset
+
+- *try these after find the right CV scheme*
+    - right now I am using only differential learning rate, haven't tried LLRD yet
+    - freezing embedding layers or layers close to it can help
+
+# 5.10
+
+>- **exp051**:
+>    - using LLRD on exp046
+>    - based: epx046
+>    - [RESULT] fold0 CV: 0.7805, LB: 0.772
+>    - [POS]
+>    - from the last epoch
+
+- replace \n\n with "[PARAGRAPH]" speical token instead of using AddToken
+
+>- **exp052**:
+>    - based: exp051
+>    - replace \n\n with [PARAGRAPH] and add it as special token
+>    - [RESULT] fold0 CV: 0.7823, LB: 0.777
+>    - [POS]
+>    - from 2nd epoch
+>    - diff: 0.0053
+>    - CV and LB are correlating when compared to based exp
+
+- In the previouse exps, all weight_decay config  were 0.0
+    - changed to 0.01 to layer except layer that does not contains in no_decay list
+
+>- **exp053**: weight_decay to 0.01
+>    - based: exp052
+>    - [RESULT] fold0 CV: 0.787, LB: 0.774
+>    - from the 2nd epoch
+>    - diff: 0.013
+
+>- **exp054**: freeze top 4 layers
+>    - based: exp053
+>    - [RESULT] fold0 CV: 0.7805, LB: 0.796
+>    - from the last epoch
+>    - diff: 0.0155
+
+>- **exp055**: use gem pooling
+>    - based: exp053
+>    - [RESULT] fold0 CV: 0.7815, LB: 0.770
+>    - from 2nd epoch
+>    - diff: 0.0115
+
+- gap between CV and LB is getting closer but it is very unstable
+
+- tasks for tmr
+    - see exp053, 54, 55 results and decide whether run exp056 or not
+
+# 5.11
+
+>- **exp056**: use both 1-e5 lr on warmup 0.2
+>    - goal: try to fix overfit at the last epoch, as previous exp possibly reached local minimum
+>    - based: exp052
+>    - [RESULT] fold0 CV: 0.7915, LB: 0.779
+>    - [POS]
+
+>- **exp057**: use both 2-e5 lr on warmup 0.2
+>    - based: exp054
+>    - [RESULT] fold0 CV: 0.7843, LB: 0.773
+
+- Since the validatiion dataset is very small, it is very hard for evaluation
+    - Should I consider the smaller gap between CV and LB better
+    - Or, when LB improves but did not show on CV because CV is relatively unstable
+
+- Does weight_decay hurt the performance because AdamW has already apply it?
+    - especially, on regreesion task
+
+- In training stack use readability as features
+
+>- **exp058**: max_norm from 1.0 to 10
+>    - based: exp054
+>    - [RESULT] fold0 CV: 0.7837, LB:
+
+>- **exp059**: lr 1-e5, warmp up ratio to 0
+>    - based: exp052
+>    - [RESULT] fold0 CV: 0.7841, LB:
+
+- no warmup does not change to fact that it best score came from the first epoch
+- In exp056, 0.7915 is from 1st epoch
+    - this score achieve when lr was close to 1-e5 which is peak of the cycle
+    - what if I start at 5-e5?
+
+>- **exp060**: lr start from 5-e5 with warmup_ratio of 0.2
+>    - based: exp052
+>    - [RESULT] fold0 CV: 0.7786, LB:
+>    - this one from last epoch but it did not converge?
+
+>- **exp061**: lr 1e-5 with warmup_ratio of 0.2 now wih weight decay 0.01
+>    - based: exp056
+>    - [RESULT] fold0 CV: 0.7909, LB: 0.779
+>    - diff: 0.0119
+
+>- **exp062**: lr 3e-5 no weight decay
+>    - based: exp056
+>    - [RESULT] fold0 CV: 0.7792, LB:
+
+>- **exp063**: lr 1e-5 linear decay lr scheduler
+>    - based: exp056
+>    - [RESULT] fold0 CV: 0.7869, LB:
+
+
+# 5.12
+
+- check oof CV of train stack notebook
+
+>- **exp064**: decrease batch_size to 4 from 8
+>    - based: exp056
+>    - [RESULT] fold0 CV: 0.7826, LB: 0.783
+>    - diff: 0.0004
+
+>- **exp065**: freeze top 4 layers
+>    - accidentally turn off clip_grad_norm
+>    - need to re run with clip_grad_norm turn on
+>    - based: exp056
+>    - [RESULT] fold0 CV: 0.7799, LB: 0.778
+>    - diff: 0.0019
+
+- CV and LB is now aligning nicely
+    - now, the problem is how I can increase the CV
+
+- why weight decay does not work?
+
+>- **exp066**: added more data from non-overlap persuade 2.0 to train only score 1, 5, 6
+>    - based: exp064
+>    - [RESULT] fold0 CV: 0.7701, LB:
+
+>- **exp067**: try freeze top 4 layers 
+>    - based: exp056
+>    - [RESULT] fold0 CV: 0.7915, LB:
+>    - does not change except more available memory
+>        - should be used only on large model to save memory with big batch size
+
+>- **exp068**: use normal training set which is default StratifiedKfold but validating using only kaggle_only data
+>    - based: exp056
+>    - save hparams as exp056 
+>    - [RESULT] fold0 CV: 0.7867, LB: 0.782
+>    - diff: 0.0047
+>    - if this looks better, I should try mix persuade 2.0
+
+>- **exp069**: added persuade 2.0 and validates on kaggle_only
+>    - based: exp068
+>    - [RESULT] fold0 CV: 0.7899, LB: 0.777
+>    - train time: 2 hours
+
+>- **exp070**: same as exp069 but include not_kaggle_only in validataion dataset that had been removed
+>    - based: exp069
+>    - [RESULT] fold0 CV: 0.7908, LB: 0.796
+>    - train time: 2.5 hours
+
+- tasks for tmr
+    - work on readability more
+    - figure out about rounding post-processing
+        - use optuna to optimize rounding?
+
+# 5.13
+
+- would base or large boost the score maybe on CV but not so much on LB
+
+- exp068 and (exp069 and exp070) have different validation set
+
+>- **exp071**: remove persuade out of the training set but remained not_kaggle_only that belonged in the validation dataset
+>    - based: exp068
+>    - [RESULT] fold0 CV: 0.7924, LB: 0.789
+>    - [POS]
+>    - dff: 0.0034
+
+>- **exp072**: change lr scheuduler to constant with warmup
+>    - based: exp071
+>    - [RESULT] fold0 CV: 0.7953, LB: 0.790
+>       - diff: 0.0053
+>    - [RESULT] fold0_2 CV: 0.8099, LB: 0.797 (optimized rounding)
+>       - diff: 0.0129
+>    - [POS]
+
+>- **exp073**: try differentiate LR with cosine warmpup 0.2 with 1e-5 and 2e-5 with 0.01 wd
+>    - based: exp071
+>    - [RESULT] fold0 CV: 0.7965, LB: 0.784
+>        - diff: 0.0125
+>    - [RESULT] fold0_2 CV: 0.8044, LB: 0.790 (optimized rounding)
+>        - diff: 0.0144
+
+- integrate optunarounder to training and infer notebook later
+    - I think each threshold is bit different in every models
+    - Does it need to calculate in inferencing?
+        - No, do it seprately
+        - Calculate it after ensemble with mean of raw output
+- So now on, when I trained 4 fold I wiil run optimization after finished the training to get most
+
+
+# 5.14
+
+- tried nelder-merd method. It improved CV butt not good as optuna
+    - ~~sometimes one other is better~~
+    - so run both and get better one
+        - optuna is usually better even with slightly lower CV
+
+>- **exp074**: same hparams as exp072 but change lr scheduler to polynomial power of 0.05
+>    - based: exp072
+>    - [RESULT] fold0 CV: 0.7937, LB:
+
+- There are two topics in NOL persuade that has similar distribution as validation set
+    - more 5 and 6 score sample
+    - Can use?
+
+>- **exp075**: mixed two topics in training dataset ['Cell phones at school','Mandatory extracurricular activities']
+>    - based: exp072
+>    - [RESULT] fold0 CV: (0.80105), LB: (0.796) (optimized rounding)
+>    - did not improve
+
+>- **exp076**: use exp072 as base, this time use base model
+>    - based: exp072
+>    - [RESULT] fold0 CV: 0.7829 (0.8121), LB: (0.793) (submitted only optimized one)
+
+>- **exp077**: increase lr to 2e-5
+>    - based: exp076
+>    - [RESULT] fold0 CV: 0.7608, LB:
+
+>- **exp078**: I want to see how warmpup 0.1 goes return to small model for this
+>    - linear decay and weight decay 0.01
+>    - based: exp071
+>    - [RESULT] fold0 CV: 0.7939 (0.8100), LB: (0.795)
+
+>- **exp079**: try groupkfold
+>    - based: exp072
+>    - [RESULT] fold0 CV: 0.7530, LB:
+>    - did not go well?
+
+
+- tasks for tmr
+    - train 4 folds exp078
+        - base model after that?
+
+# 5.15
+
+>- **exp80**: same setup with exp078 but 4 folds
+>    - based: exp078
+>    - [RESULT] 4fold oof CV: 0.7855, LB: 0.795
+>    - [RESULT] 4fold oof CV: 0.7971, LB: 0.794 (NM)
+>    - [RESULT] 4fold oof CV: 0.7964, LB: 0.803 (OPTUNA)
+>       - diff: 0.0066
+
+- Since CV scheme changes best qwk score is always showing up at middle on the training (not last epoch)
+    - despite of having more data to train the score is almost always lower
+    - Is there are any chances I saved the wrong epoch?
+
+- Maybe split then filtered out is not the good way
+    -  So I should filtered kaggle-only data first to k0 to k4 then add addtional data
+
+
+- Let's organize CV scheme again
+    1. FIRST
+        - splited train_df_with_prompt with StratifiedKFold
+        - training set
+            - (!= fold_num) + (== fold_num & kaggle_only == False)
+        - validating set
+            - (== fold_num)
+
+    2. SECOND
+        - splited `train_df_with_prompt[train_dfwith_prompt['kaggle_only'] == True]` as ko
+        - splited `train_df_with_prompt[train_dfwith_prompt['kaggle_only'] == False]` as nok
+        - training set
+            - (ko != fold_num) + (nok)
+        - validating set
+            - (ko == fold_num)
+
+    2. THIRD
+        - splited `train_df_with_prompt[train_dfwith_prompt['kaggle_only'] == True]` as ko
+        - splited `train_df_with_prompt[train_dfwith_prompt['kaggle_only'] == False]` as nok
+        - training set
+            - (ko != fold_num) + (nok != fold_num)
+        - validating set
+            - (ko == fold_num)
+
+    2. FOUTH
+        - splited `train_df_with_prompt[train_dfwith_prompt['kaggle_only'] == True]` as ko
+        - splited `train_df_with_prompt[train_dfwith_prompt['kaggle_only'] == False]` as nok
+        - training set
+            - (ko != fold_num) + (nok == fold_num)
+        - validating set
+            - (ko == fold_num)
+
+- try to balance distribution
+    - add 'Distance learning'  (have more 5 and 6 samples)
+    - add 'Seeking multiple opinions' (majority of samples is 4 )
+
+- I think I need to from now on I have to train 4 folds
+    - 1 fold tends to overfitted 1 validation set more than others
+    - when I found one good score from 1 fold it does not transfer to others
+
+- tasks for tmr
+    - train 4 fold of exp081
+
+# 5.16
+
+>- **exp081**: add 'Distance learning' topic (have more 5 and 6 samples)
+>    - add before split
+>        - validation set changed
+>            - by intersected around 300 of datapoint and 800 that were difference
+>            - some intersected datapoint does not have score 6
+>    - based: exp078
+>    - all best epoch from the last one
+>    - [RESULT] 4fold oof CV: 0.7858, LB: 0.796
+>    - [RESULT] 4fold oof CV: 0.7973, LB: 0.799 (OPTUNA)
+
+- ensembled exp080 and exp081 CV: 0.7996, LB: 0.804
+
+- **I have to be very be carefully about mixing new data**
+    - **score might improved but there are more chances that It might start to overfit**
+
+- cls taks can also use optimized thresholds method using raw predict
+
+- ensemble between
+    - diff pooling
+    - diff task
+    - diff kfold (skf, sgkf)
+    - diff architects (longformer, roberta, deberta)
+    - SVR
+    - (LGBM is bit concerning)
+
+- Comparison between raw predictions exp080 and exp081
+    - diff between mean and std
+        - exp081 is clearly leaning toward high score mean across all folds is around 2.6-7 and a bit more fluctuating by std is around 0.83-4
+        - exp089 tends to overall predict lower score mean arcoss all folds is aroudn 2.4-6 but std is quite consistant around 0.78
+    - This had shown that raw predict is also share the similar distribution as its training set 
+    - If I try to manipulate the distribution, would it become overfit to validation set?
+
+>- **exp082**: try FOUTH CV scheme as it has bell curve
+>    - better result is not expect here, it should be quick training
+>    - [RESULT] fold0 CV: 0.8101, LB: 0.779 diff: 0.0311
+>    - [RESULT] fold0 CV: 0.8261, LB: 0.788 diff: 0.0381 (Optuna)
+>    - Why cv is so high despite the size of the training set
+>        - this looks similar to normal stratifiedKfold so the diff gap
+    
+- How can I balance distribution between training set and validations set
+
+- Maybe to only way to use extra Persuade 2.0 is to predict later by trained model without it then add to LGBM later
+
+# 5.17
+
+- Higher score predict seems to share to same shape of histogram
+    - this has shown in exp078(fold0) and exp080 (4folds)
+
+>- **exp083**: take some topics out ['Car-free cities', 'Does the electoral college work?']
+>    - these topics does not contain in kaggle-only
+>    - [RESULT] fold0 CV: 0.7925, LB: 0.800 diff: 0.0075
+>    - [RESULT] fold0 CV: 0.8049, LB: 0.802 (Optuna) diff: 0.0029
+>    - train time: around 14 mins per epoch
+>    - It worked?
+>    - Optuna did not adjust much in the middle range but adjust heavily on both end
+
+- Predicted and evaluate using exp083 on these two topics
+    - f1: 0.594
+    - qwk: 0.7797
+    - not neither bad or good, lets how 4 folds perform
+- Predcited and evaluate using exp083 on persuade 2.0
+    - f1: 0.494
+    - qwk: 0.7756
+    - pretty bad 
+- On the other hand
+    - When I used exp080f0 as predictor
+        - f1: 0.5197
+        - qwk: 0.7916
+        - not significantly better but still betterr
+
+- I needs to find a way to handle this
+        - There are chances that others topics could appear in private dataset
+
+- Is that mean that these topics are noises?
+    - How do they perform on unseen topics then?
+
+- check print loss average and value
+
+- In LGBM notebook, when apply new CV scheme training dataset is accordingly get larger
+    - this cause notebook kernel died early in the process
+
+>- **exp084**: exp083 but 4 folds
+>    - based: exp083
+>    - [RESULT] 4folds oof CV: 0.7860, LB: 0.793 diff: 0.007
+>    - [RESULT] 4folds oof CV: 0.7976, LB: 0.800 diff: 0.0024 (OPTUNA)
+
+>- **exp085**: use typical StratifiedKFold do not filter or any trick
+>    - as in, train: (!= fold_num), valid (== fold_num)
+>    - this exp still removed two topics
+>    - [RESULT] 4folds oof CV: 0.8199, LB:
+>    - [RESULT] 4folds oof CV: 0.8295, LB: 0.808 (OPTUNA) diff: 0.0215
+>    - Every folds picked last epoch
+>    - But gap between CV and LB is quite large 
+
+
+- analyze more on exp80, exp84
+
+- **exp086**: train: (!= fold_num), valid: (== fold_num & kaggle_only == True)
+    - [RESULT] 4folds oof CV: 0.7899, LB:
+    - [RESULT] 4folds oof CV: 0.7972, LB:  (OPTUNA)
+
+- **exp087**: train: all OL_persaude + (ko != fold_num), valid: (ko == fold_num)
+
+- If exp085 or exp086 does not give a good result, might have to think about next step
