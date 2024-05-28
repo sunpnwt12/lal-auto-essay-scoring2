@@ -883,7 +883,7 @@
 
 # 5.15
 
->- **exp80**: same setup with exp078 but 4 folds
+>- **exp080**: same setup with exp078 but 4 folds
 >    - based: exp078
 >    - [RESULT] 4fold oof CV: 0.7855, LB: 0.795
 >    - [RESULT] 4fold oof CV: 0.7971, LB: 0.794 (NM)
@@ -1002,13 +1002,14 @@
 - Predicted and evaluate using exp083 on these two topics
     - f1: 0.594
     - qwk: 0.7797
-    - not neither bad or good, lets how 4 folds perform
+    - not neither bad or good, let's see how 4 folds perform
+
 - Predcited and evaluate using exp083 on persuade 2.0
     - f1: 0.494
     - qwk: 0.7756
     - pretty bad 
 - On the other hand
-    - When I used exp080f0 as predictor
+    - When used exp080f0 as predictor
         - f1: 0.5197
         - qwk: 0.7916
         - not significantly better but still betterr
@@ -1026,24 +1027,446 @@
 
 >- **exp084**: exp083 but 4 folds
 >    - based: exp083
+>    - This exp validation set is (== fold_num & kaggle_only == True)
 >    - [RESULT] 4folds oof CV: 0.7860, LB: 0.793 diff: 0.007
 >    - [RESULT] 4folds oof CV: 0.7976, LB: 0.800 diff: 0.0024 (OPTUNA)
 
->- **exp085**: use typical StratifiedKFold do not filter or any trick
+>- **exp085**: use typical StratifiedKFold no filter or exclude any thing
 >    - as in, train: (!= fold_num), valid (== fold_num)
+>    - based: exp084
 >    - this exp still removed two topics
->    - [RESULT] 4folds oof CV: 0.8199, LB:
->    - [RESULT] 4folds oof CV: 0.8295, LB: 0.808 (OPTUNA) diff: 0.0215
+>    - [RESULT] 4folds oof CV: 0.8199, LB: 0.796 diff: 0.0239
+>    - [RESULT] 4folds oof CV: 0.8295, LB: 0.808 diff: 0.0215 (OPTUNA)
+>    - but both CV and LB were up
 >    - Every folds picked last epoch
 >    - But gap between CV and LB is quite large 
 
-
 - analyze more on exp80, exp84
 
-- **exp086**: train: (!= fold_num), valid: (== fold_num & kaggle_only == True)
-    - [RESULT] 4folds oof CV: 0.7899, LB:
-    - [RESULT] 4folds oof CV: 0.7972, LB:  (OPTUNA)
-
-- **exp087**: train: all OL_persaude + (ko != fold_num), valid: (ko == fold_num)
+>- **exp086**: train: (!= fold_num), valid: (== fold_num & kaggle_only == True)
+>    - this exp included all 7 prompt_name in default training dataset
+>    - [RESULT] 4folds oof CV: 0.7899, LB: 
+>    - [RESULT] 4folds oof CV: 0.7972, LB: 0.800 (OPTUNA)
 
 - If exp085 or exp086 does not give a good result, might have to think about next step
+
+# 5.18
+
+- After looking throught competition's discussion, it seems that those removed two topics does not appear in test dataset
+    - So going forward removed these two topics should be must
+
+- Sine removing two topics make current remainning topics only 5
+    - should I change to 5 folds split?
+    - that means StratifiedGroupKFold and GroupKFold are basically the same split
+    - kaggele_only == True might make training pick the wrong epoch of training
+        - the stratifiedfkfold MIGHT cause topics-leakage, that could be the reasons why CV is higher than LB
+
+>- **exp087**: 5 folds without two topics
+>    - GroupKFold -> see if topics leakage really occured
+>    - [RESULT] fold0 CV: 0.7524, LB: 0.791
+>    - [RESULT] fold0 CV: 0.7840, LB: 0.758 (OPTUNA)
+
+- StratifiedKFold but remove one topic from each training set
+
+>- **exp088**: scale exp085 to base model same hparams
+>    - based: exp085
+>    - 1 hours and 24 mins
+>    - [RESULT] fold0 CV: 0.8289, LB:
+>    - [RESULT] fold0 CV: 0.8377, LB: 0.784 (OPTUNA)
+
+>- **exp089**: change lr from 1e-5 to 2e-5
+>    - based: exp085
+>    - [RESULT] fold0 CV: 0.8367, LB: 
+>    - [RESULT] fold0 CV: 0.8417, LB: 0.790 (OPTUNA)
+
+>- **exp90**: try CORN loss
+>    - based: exp085
+>    - [RESULT] fold0 CV: 0.7548, LB:
+
+# 5.19
+
+- let's organize how different CV schemes have been working so far
+    1. using all 7 prompt_names
+        1. use kaggle-only data as validation set and add remained validation data to training set
+            - used in: *exp080*
+                - exposed to all prompt
+                - [RESULT] 4fold oof CV: 0.7964, LB: 0.803 diff: 0.0066(OPTUNA)
+            - training set
+                - (!= fold_num) + (== fold_num & kaggle_only == False)
+            - validataing set
+                - (== fold_num & kaggle_only == True)
+
+        2. use kaggle-only data as validation set 
+            - training set
+                - (!= fold_num)
+            - validating set
+                - (== fold_num & kaggle_only == True)
+
+        3. use typical StratifiedKFold
+            - used in: *exp015*
+                - [RESULT] 4fold oof CV: 0.8284, LB: 0.798 diff: 0.0304 (np.rint)
+            - training set
+                - (!= fold_num)
+            - validating set
+                - (== fold_num)
+
+    2. using only 5 prompt_names (removed ['Car-free cities', 'Does the electoral college work?'])
+        1. use kaggle-only data as validation set and add remained validation data to training set
+            - used in: *exp084*
+                - exposed to all prompt
+                - [RESULT] 4folds oof CV: 0.7976, LB: 0.800 diff: 0.0024 (OPTUNA)
+            - training set
+                - (!= fold_num) + (== fold_num & kaggle_only == False)
+            - validataing set
+                - (== fold_num & kaggle_only == True)
+
+        2. use kaggle-only data as validation set 
+            - training set
+                - (!= fold_num)
+            - validating set
+                - (== fold_num & kaggle_only == True)
+
+        3. use typical StratifiedKFold
+            - used in: *exp085*
+                - [RESULT] 4folds oof CV: 0.8295, LB: 0.808 diff: 0.0215 (OPTUNA)
+            - training set
+                - (!= fold_num)
+            - validating set
+                - (== fold_num)
+
+- So adding removed-not-kaggle-only from validation set later is different from splitting kaggle-only then add whole not-kaggle-only
+    - former is containing all 7 prompt_name while latter does not
+
+>- **exp091**: split kaggle_only first then add ol_persaude to each training set
+>    - [RESULT] fold0 CV: 0.7968, LB: 0.784 diff: 0.0128
+>    - [RESULT] fold0 CV: 0.8167, LB: 0.795 diff: 0.0217
+
+
+>- **exp092**: based on exp085 change 1e-5 to 3e-5
+>    - based: exp085
+>    - [RESULT] fold0 CV: 0.8344, LB:
+>    - loss is higher than exp085
+
+>- **exp093**: based on exp085 large model lr 2e-5
+>    - just to test how large perform
+>    - 7 prompt_name is still safer to use
+>    - based: exp085
+>    - [RESULT] fold0 CV: 0.8295, LB:
+>    - [RESULT] fold0 CV: 0.8389, LB: 0.804
+>    - from first epoch
+
+- split fold as if it is a multilabel problem?
+    - based on score and prompt_name
+
+>- **exp094**: 
+>    - small model hparams is the same as exp085 but all 7 prompt_name
+>    - test more with 5 prompt_name later
+>    - [RESULT] fold0 CV: 0.8245, LB: 0.794 diff: 0.0305
+>    - [RESULT] fold1 CV: 0.8208, LB: 0.797 diff: 0.0238
+>    - [RESULT] fold2 CV: 0.8232, LB: 0.789 diff: 0.0342
+>    - [RESULT] fold3 CV: 0.8196, LB: 0.798 diff: 0.0216
+
+>    - [RESULT] fold0 CV: 0.8333, LB: 0.808 (LB is OPTUNA Threshold)
+>    - [RESULT] 4folds oof CV: 0.8220, LB:
+>    - [RESULT] 4folds oof CV: 0.8299, LB: 0.805 diff: 0.0249
+
+# 5.20
+
+- new weight initialization?
+- multitask learning? train both prompt_name and score at the same time
+
+>- **exp095**: added prompt_name as target
+>    - exp
+>    - this MIGHT make score share the weight with prompt
+>    - [RESULT] fold0 CV: 0.8221, LB:
+>    - [RESULT] fold0 CV: 0.8294, LB: 0.808
+
+>- **exp096**: based on exp094 turn hparams lr from 1e-5 to 2-e5
+>    - based: exp094
+>    - [RESULT] fold0 CV: 0.8235, LB:
+
+>- **exp097**: try kaggle-only validation
+>    - split to ko and nko
+>    - train: (ko != fold_num) + (nko != fold_num), valid: (ko == fold_num)
+>    - [RESULT] fold0 CV: 0.7919, LB:
+>    - [RESULT] fold0 CV: 0.7971, LB: 0.798
+
+>- **exp098**: try kaggle-only validation
+>    - split to ko and nko
+>    - train: (ko != fold_num) + (nko), valid: (ko == fold_num)
+>    - [RESULT] fold0 CV: 0.7889, LB: 
+>    - [RESULT] fold0 CV: 0.7951, LB: 0.790
+
+
+- tasks for tmr
+    - submit exp094 with np.rint
+    - decide whether submit all folds from exp094 of not
+    - there is something wrong why some essay ground truth is 1 but model scored 4 or 5
+        - maybe model learn only from legnth of the full_text of something else
+        - need to look through this in EDA
+
+# 5.21
+
+- exp094 each fold using np.rint
+    - fold 0:
+        - train:
+            - fold 1, 2, 3
+         - result: 0.794 
+    - fold 1:
+        - train:
+            - fold 0, 2, 3
+         - result: 0.797
+    - fold 2: 
+        - train:
+            - fold 0, 1, 3
+         - result: 0.789
+    - fold 3: 
+        - train:
+            - fold 0, 1, 2
+        - result: 0.798
+
+- seems like pred difference is cause by length of the essay
+    - by typical lower score wold have around 1400 to 1500 chars or around from 300 to 400 of token length 
+    - On higher side of score length go higher from 2600 and up to 4500 chars or 500 to 800 of token
+        - predictions differences are often occured when ground truth score is lower but model decide to predict higher than it should based on length of the essay
+
+
+- train start point of the discourse element first
+    - then inference the train model into the full_text to give full_text more rich information.
+    - the point is the give model more information about how certain setence mean to the whole essay
+    - not sure if this possible with multilabel because some does not contain some discourse type
+        - if the essay does not have some type label it as -1?
+    - try with CLAIM first
+    - Or I can predict how many unique discourse type has
+        - not that is not possible because there is no way to integrate this formation into training set
+    - this approach harder to execute than I thought maybe comeback later?
+
+
+> Bias-Variance Trade-off:
+> A higher number of splits (e.g., 5) typically reduces bias but increases variance, while a lower number of splits (e.g., 4) has the opposite effect.
+> Bias refers to the error introduced by approximating a real-world problem, while variance refers to the sensitivity of the model to the specific data it was trained on.
+
+ 
+>- **exp099**: train max_len 1024, valid max_len 768
+>    - use shorter valid max_len to mitigate text length dependent
+>    - based: exp094
+>    - [RESULT] fold0 CV: 0.8182, LB:
+>    - [RESULT] fold0 CV: 0.8309, LB: 
+>    - shorter length of validation make OOF prediction between 5 and 6 become hard
+>        - as this exp mostly predicted 5 instead 6 in y_trues
+
+
+# 5.22
+
+- Gathered discourse_type and found that higher score tends to have move discoure_type_num
+    - thus, higher scores possibly have a clear type of discourse statement
+    - To test idea is meaning full, 
+        - let's first try with feed sentence by sentence
+        - labels the sentence that which class that sentence belongs to
+        - I need to seperate train and valid with multilabel score and prompt_name
+    - f1_score for fold0 is 0.78, quite mediocre but not unusable
+    - Rebuttal and evidence seem to have a significant impact on how essays were score
+    - choose rebuttal and evidence to mix into training dataset first
+    - finished created training set with new special token
+        - this one coming from only 1 fold, can get better result with 4 folds
+
+
+- task for tmr
+    - fork train notebook to train on this new training dataset
+
+# 5.23
+
+- before fork new notebook, I need to find threshold for prediction confident
+    - get it from OOF CV
+
+- found some token weirdly placed in persaude dataset
+    - unannotated right after s in such as -> s[UANNOTATED]uch as
+    - should not be problem becaue unannotated will be ditched anyway?
+
+- inferencing 1 batch at the time have a lot of overhead thus increase unnecessary time
+    - need to fix this infer notebook
+
+- need to study more about f1_score, auc_roc_score
+
+- **exp0100**:
+    - added special token to text (added rebutta and evidence)
+    - [RESULT] fold0 CV: 0.8198, LB: 0.790
+    - [RESULT] fold0 CV: 0.8253, LB: 0.799 (OPTUNA)
+    - [RESULT] fold0 CV: 0.8261, LB: 0.799 (NM)
+    - *found bugs: tokens from not_kaggle_only are only from the first one*
+    - So basically this one is failed experiment
+
+- tasks for tmr:
+    - train sen_discourse again this time with 4fold with colab
+        - or large 1 fold? May 1 fold of large is better?
+    - infer on kaggle_only
+    - created new train_combined_tokened
+    - train tokened_text -> exp101
+
+# 5.24
+
+- predict text dependent and indepedent?
+    - because depends on type of essay writting style will be largely different
+    - text depedent will quote and mention thing that is specific and context from one source
+    - On the other hand, Indepedent will represent more about writer opinion which is more general
+    - In default training dataset, all essays is text dependent
+        - topics (prompt_name) that does not exist in the first is independent
+        - that could explain why hidden test is giving bad score because they (test) are all text dependent?
+
+- 2 topics are different from others
+    - ['Car-free cities', 'Does the electoral college work?']
+    - they have multiple sources
+    - their essay could have a wide range of things to write about
+        - which means, they may mention or give evidence from more than 1 source
+        - evidence from 2 sources and 3 sources might make difference
+    - this explained a bit why 5 prompt_name (without)
+    - Should I try to seperate subtype of these essays first?
+        - Maybe using text with special tokened could help as it is providing which sentence indicated as Evidence discourse
+
+- **exp101**: fixed exp100
+    - (added rebutta and evidence)
+    - [RESULT] fold0 CV: 0.8359, LB: 0.784
+    - [RESULT] fold0 CV: 0.8426, LB: 0.792
+
+- put selected token inside config?
+    - no
+
+- **exp102**: add all tokens except Unannotated
+    - [RESULT] fold0 CV: 0.8382, LB: 0.754
+
+- **exp103**: add all tokens 
+    - [RESULT] fold0 CV: 0.8420, LB:
+
+- Need to look more into how to split sentence
+
+# 5.25
+
+- discourse type is being replace by a set of sentences
+    - merge them with when the current one is the same as previous discourse type
+
+- re-organize steps
+    1. create discourse text
+        - extract from persaude1.0 and persuade2.0 (part1 of data) -> sen_discourse.csv
+        - train model on extracted discourse text 
+        - infer on data that does not have discourse type (part2 of data) (mostly kaggle_only) -> dt_pred.csv
+            - post-processing: remove discourse type when there is consecutive type
+                - this make sentence with type become set of sentence instead
+        - concatenate infered discourse text with extracted discourse text (send_discourse + dt_pred) -> train_tokened_text
+    2. use newly created tokened text train mode and predict score
+
+- **exp104**: 
+    - same record as typical training
+    - all token is trained
+    - if token appeared consecutively remove it
+    - [RESULT] fold0 CV: 0.8395, LB: 0.777
+    - [RESULT] fold0 CV: 0.8454, LB: 0.799 (OPTUNA)
+    - [RESULT] fold0 CV: 0.8476, LB: 0.795 (NM)
+
+- **exp105**:
+    - removed Unannotated threshold 0.75 on inferred kaggle_only data
+    - cleaned up data more
+    - [RESULT] fold0 CV: 0.8380, LB: 0.784
+
+
+# 5.26
+- found bugs \n\n got removed in not_kaggle_only data
+
+# 5.27
+
+- So idea is working only when is token correctly placed
+    - in training tokened text phrase, qwk went up.
+        - this proved that the idea is working
+    - the problem is most of the training data is from persaude which discourse type is labeled by human
+        - the labeled type is considered as correct one, the tokened text in  kaggle_only data is created from prediction
+        - It is not accurate as the hand labeled one
+        - thus, when the type predictor model encounter new data, it did fairly poor job that led to score predictor to worse result
+    - if I can find a way to improved performance of type predictor and decrease inferencing time.
+        - this idea will work out
+
+    - to reduce inferencing time, NN model should not being used. rather, LGBM or SVR can help?
+        - should try SVR first? As LGBM will consume of features engineering, but SVR only needs embedding from NN model
+
+- **exp106**:
+    - try this last time, need to move on if this does not works
+    - D005
+    - include only evidence token because it has over 0.8 on f1_score
+    - [RESULT] fold0 CV: 0.8295, LB: 0.798 
+        - diff: 0.0315
+        - RESLUT from exp094, fold0 CV: 0.8245, LB: 0.794 diff: 0.0305
+            - CV+0.0055, LB+0.004
+        - this result, agian, re-proved the idea. I just have to make this right on discourse type predicting part
+            - first, improved model performance
+            - second, decease inferring time
+
+- maybe change all pandas to polars to speed up?
+    - changed in predicting and creating discourse type part
+    - predict_cv remained to the same
+
+- **exp107**
+    - D005 <- this is only 1 fold
+        - can improved by add more data or increase size of the model
+        - add find threshold for each discourse type
+    - add claim token as precision is high enough (around 0.8)
+    - purpose to test the result
+    - [RESULT] fold0 CV: 0.838, LB: 0.785
+
+- maybe only evidence as it is most accurate?
+
+# 5.28
+
+- DT train recap
+    - D001 small model
+        - all token included
+        - bugged
+        - did not used anywhere
+    - D002 small model
+        - all token included
+        - lr 2e-5
+    - D003 base model
+        - all token included
+    - D004 small model
+        - did not used anywhere
+    - D005 small model
+        - excluded unannotated token
+    - D006
+        - train binary between Evidence vs. Others
+
+- discourse type predictor inferencing time
+    - small model takes around 1 hrs and 30 mins (3.19it/s in sample sub)
+    - base model takes around (4.29it/s in sample sub)
+    - turned out, it took so long before copying between polars and pandas
+        - test sub took only 1 hours
+        - can still improve this
+            - reduce reliance on pandas
+
+- In final submission, `lead`, `claim`, `evidence` can be used as they have the most obvious trends
+    - more num of discourse, higher score 
+    - others has the similar trend, but they not obvious the gradient are steep, some has slightly drop.
+
+- Large model should be used as discourse type because it will influence others models in second stage so much
+    - could extend more options for usable token
+    - D009 trained excluded unnanotated
+        - 1 epoch takes around 1 hours
+
+- not removing repeated have lower score
+    - take 1 hours and 25 mins to finish
+
+- lead and conclude should appear only once in the essay
+    - filter out if there is one more, if use
+    - do this after remove repeated discouse type
+    - also position?
+        - no, as almost every essay has one
+
+- `claim` might be difficult to use as train as kaggle_only data produce too much of claim
+    - discourse type predictor was not good on this particurly discourse type even in large model
+
+- try add lead and counter claim as the next experiment
+
+- cleaned up train_tokened_text more
+    - lead and conclude only appear once in each essay if exist
+    - remove consecutive discourse type
+
+- **exp106.5**
+    - same condition as exp106, but with newly adjusted data
+    - [RESULT] fold0 CV: , LB:
+        - prev [RESULT] fold0 CV: 0.8295, LB: 0.798 
