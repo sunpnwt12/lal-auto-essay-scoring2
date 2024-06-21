@@ -363,7 +363,7 @@
 >    - [RESULT] fold0 CV: 0.8242, LB: 0.792
 
 
->- **exp024**: try max_norm 10 t 1.0
+>- **exp024**: try max_norm 10 to 1.0
 >    - based: exp023, exp015
 >    - [RESULT] fold0 CV: 0.8228, LB: 0.794
 
@@ -607,7 +607,7 @@
 > trains P + [K1, K2, K4] validates K3
 > trains P + [K1, K2, K3] validates K4
 >
-> where P is full pursuade corpus.
+> where P is full persuade corpus.
 
 >- **exp046**: setup new CV scheme
 >    - follow the above method
@@ -618,10 +618,10 @@
 
 >- **exp047**: 
 >    - based: exp046
->    - still using kaggle-only data as validation datset
->    - this exp added extra data from persuade 2.0 that does not appear in default dataset splited 
+>    - still using Kaggle-only data as validation dataset
+>    - this exp added extra data from persuade 2.0 that does not appear in default dataset split
 >    - also, how training set mix is a bit unusual
->        - training set is splited then splited persuade dataset was added
+>        - training set is split then split persuade dataset was added
 >    - [RESULT] fold0 CV: 0.7808, LB: 0.778
 >    - from 2nd epoch
 
@@ -1141,7 +1141,6 @@
 >    - [RESULT] fold0 CV: 0.7968, LB: 0.784 diff: 0.0128
 >    - [RESULT] fold0 CV: 0.8167, LB: 0.795 diff: 0.0217
 
-
 >- **exp092**: based on exp085 change 1e-5 to 3e-5
 >    - based: exp085
 >    - [RESULT] fold0 CV: 0.8344, LB:
@@ -1167,7 +1166,7 @@
 >    - [RESULT] fold3 CV: 0.8196, LB: 0.798 diff: 0.0216
 
 >    - [RESULT] fold0 CV: 0.8333, LB: 0.808 (LB is OPTUNA Threshold)
->    - [RESULT] 4folds oof CV: 0.8220, LB:
+>    - [RESULT] 4folds oof CV: 0.8220, LB: 0.797
 >    - [RESULT] 4folds oof CV: 0.8299, LB: 0.805 diff: 0.0249
 
 # 5.20
@@ -1178,7 +1177,7 @@
 >- **exp095**: added prompt_name as target
 >    - exp
 >    - this MIGHT make score share the weight with prompt
->    - [RESULT] fold0 CV: 0.8221, LB:
+>    - [RESULT] fold0 CV: 0.8221, LB: 0.794
 >    - [RESULT] fold0 CV: 0.8294, LB: 0.808
 
 >- **exp096**: based on exp094 turn hparams lr from 1e-5 to 2-e5
@@ -1288,13 +1287,13 @@
 
 - need to study more about f1_score, auc_roc_score
 
-- **exp0100**:
-    - added special token to text (added rebutta and evidence)
-    - [RESULT] fold0 CV: 0.8198, LB: 0.790
-    - [RESULT] fold0 CV: 0.8253, LB: 0.799 (OPTUNA)
-    - [RESULT] fold0 CV: 0.8261, LB: 0.799 (NM)
-    - *found bugs: tokens from not_kaggle_only are only from the first one*
-    - So basically this one is failed experiment
+>- **exp100**:
+>    - added special token to text (added rebutta and evidence)
+>    - [RESULT] fold0 CV: 0.8198, LB: 0.790
+>    - [RESULT] fold0 CV: 0.8253, LB: 0.799 (OPTUNA)
+>    - [RESULT] fold0 CV: 0.8261, LB: 0.799 (NM)
+>    - *found bugs: tokens from not_kaggle_only are only from the first one*
+>    - So basically this one is failed experiment
 
 - tasks for tmr:
     - train sen_discourse again this time with 4fold with colab
@@ -1323,19 +1322,19 @@
     - Should I try to seperate subtype of these essays first?
         - Maybe using text with special tokened could help as it is providing which sentence indicated as Evidence discourse
 
-- **exp101**: fixed exp100
-    - (added rebutta and evidence)
-    - [RESULT] fold0 CV: 0.8359, LB: 0.784
-    - [RESULT] fold0 CV: 0.8426, LB: 0.792
+>- **exp101**: fixed exp100
+>    - (added rebuttal and evidence)
+>    - [RESULT] fold0 CV: 0.8359, LB: 0.784
+>    - [RESULT] fold0 CV: 0.8426, LB: 0.792
 
 - put selected token inside config?
     - no
 
-- **exp102**: add all tokens except Unannotated
-    - [RESULT] fold0 CV: 0.8382, LB: 0.754
+>- **exp102**: add all tokens except Unannotated
+>    - [RESULT] fold0 CV: 0.8382, LB: 0.754
 
-- **exp103**: add all tokens 
-    - [RESULT] fold0 CV: 0.8420, LB:
+>- **exp103**: add all tokens 
+>    - [RESULT] fold0 CV: 0.8420, LB:
 
 - Need to look more into how to split sentence
 
@@ -1354,18 +1353,18 @@
         - concatenate infered discourse text with extracted discourse text (send_discourse + dt_pred) -> train_tokened_text
     2. use newly created tokened text train mode and predict score
 
-- **exp104**: 
-    - same record as typical training
-    - all token is trained
-    - if token appeared consecutively remove it
-    - [RESULT] fold0 CV: 0.8395, LB: 0.777
-    - [RESULT] fold0 CV: 0.8454, LB: 0.799 (OPTUNA)
-    - [RESULT] fold0 CV: 0.8476, LB: 0.795 (NM)
+>- **exp104**: 
+>    - same record as typical training
+>    - all token is trained
+>    - if token appeared consecutively remove it
+>    - [RESULT] fold0 CV: 0.8395, LB: 0.777
+>    - [RESULT] fold0 CV: 0.8454, LB: 0.799 (OPTUNA)
+>    - [RESULT] fold0 CV: 0.8476, LB: 0.795 (NM)
 
-- **exp105**:
-    - removed Unannotated threshold 0.75 on inferred kaggle_only data
-    - cleaned up data more
-    - [RESULT] fold0 CV: 0.8380, LB: 0.784
+>- **exp105**:
+>    - removed Unannotated, threshold 0.75 on inferred kaggle_only data
+>    - cleaned up data more
+>    - [RESULT] fold0 CV: 0.8380, LB: 0.784
 
 
 # 5.26
@@ -1386,29 +1385,30 @@
     - to reduce inferencing time, NN model should not being used. rather, LGBM or SVR can help?
         - should try SVR first? As LGBM will consume of features engineering, but SVR only needs embedding from NN model
 
-- **exp106**:
-    - try this last time, need to move on if this does not works
-    - D005
-    - include only evidence token because it has over 0.8 on f1_score
-    - [RESULT] fold0 CV: 0.8295, LB: 0.798 
-        - diff: 0.0315
-        - RESLUT from exp094, fold0 CV: 0.8245, LB: 0.794 diff: 0.0305
-            - CV+0.0055, LB+0.004
-        - this result, agian, re-proved the idea. I just have to make this right on discourse type predicting part
-            - first, improved model performance
-            - second, decease inferring time
+>- **exp106**:
+>    - try this last time, need to move on if this does not works
+>    - D005
+>    - include only evidence token because it has over 0.8 on f1_score
+>    - [RESULT] fold0 CV: 0.8295, LB: 0.798 
+>        - diff: 0.0315
+>        - RESLUT from exp094, fold0 CV: 0.8245, LB: 0.794 diff: 0.0305
+>            - CV+0.0055, LB+0.004
+>        - this result, agian, re-proved the idea. I just have to make this right on discourse type predicting part
+>            - first, improved model performance
+>            - second, decease inferring time
 
 - maybe change all pandas to polars to speed up?
     - changed in predicting and creating discourse type part
     - predict_cv remained to the same
+	
 
-- **exp107**
-    - D005 <- this is only 1 fold
-        - can improved by add more data or increase size of the model
-        - add find threshold for each discourse type
-    - add claim token as precision is high enough (around 0.8)
-    - purpose to test the result
-    - [RESULT] fold0 CV: 0.838, LB: 0.785
+>- **exp107**
+>    - D005 <- this is only 1 fold
+>        - can improved by add more data or increase size of the model
+>        - add find threshold for each discourse type
+>    - add claim token as precision is high enough (around 0.8)
+>    - purpose to test the result
+>    - [RESULT] fold0 CV: 0.838, LB: 0.785
 
 - maybe only evidence as it is most accurate?
 
@@ -1466,7 +1466,1132 @@
     - lead and conclude only appear once in each essay if exist
     - remove consecutive discourse type
 
-- **exp106.5**
-    - same condition as exp106, but with newly adjusted data
-    - [RESULT] fold0 CV: , LB:
-        - prev [RESULT] fold0 CV: 0.8295, LB: 0.798 
+>- **exp106.5**
+>    - same condition as exp106, but with newly adjusted data
+>    - [RESULT] fold0 CV: 0.8287, LB: 0.794
+>        - prev [RESULT] fold0 CV: 0.8295, LB: 0.798 
+>    - did not help
+>    - going forward remove consecutive discourse type should only be done in post-process
+
+# 5.29
+
+- on previous train_tokened_text 
+    - consecutive discourse type in dataset was not removed but get higher score (exp106)
+    - but when removed consecutive type score get a bit lower (exp106.5)
+        - let's see on how LB would do
+    - both removed consecutive on inferencing
+
+>- **exp108**:
+>    - try max_len 2048 instead of 1024
+>    - taking more tokens
+>    - [RESULT] fold0 CV: 0.8297, LB: 0.798
+
+>- **exp109**:
+>    - add lead (now have evidence and lead)
+>    - use D005
+>    - [RESULT] fold0 CV: 0.8282, LB: 0.795
+
+
+>- **exp110**:
+>    - add claim (now have evidence and claim)
+>    - use D005
+>    - [RESULT] fold0 CV: 0.8375, LB: 0.785
+>    - 1 hours and 40 mins when submit
+>       - score predictor small model usually takes around 7-10mins
+
+>- **exp111**:
+>    - add counter claim (now have evidence and counter claim)
+>    - use D005
+>    - [RESULT] fold0 CV: 0.8288, LB: 0.786
+
+- even 1 fold of base model take close to 10 mins on 3 records
+    - then it should be SVR or LGBM
+    - lets first try SVR as it is closer to NN
+        - embeddings took time so much
+        - use them in colab notebook with faster gpu
+    - lgb is almost impossible to train because lack of features
+        - in the past competition, it was used for stacking
+
+# 5.30
+
+- removed repeated only on claim and position
+
+>- **exp112**
+>    - add claim only
+>    - [RESULT] fold0 CV: 0.8351, LB: 0.786
+
+>- **exp113**
+>    - add claim only
+>    - same as exp112 but classification
+>    - [RESULT] fold0 CV: 0.8295, LB: 0.786
+
+- recap token strat
+    - all of these exps are not using the same D model (D005)
+    - tried
+        - all except unannotated*
+            - exp103 [RESULT] fold0 CV: 0.8382, LB: 0.754
+        - evidence + rebuttal* old data
+            - exp101 [RESULT] fold0 CV: 0.8359, LB: 0.784
+        - evidence + claim
+            - exp110 [RESULT] fold0 CV: 0.8375, LB: 0.785
+        - evidence + lead
+            - exp109 [RESULT] fold0 CV: 0.8282, LB: 0.795
+        - evidence + counter
+            - exp111 [RESULT] fold0 CV: 0.8288, LB: 0.786
+        - evidence + position
+            - exp115 [RESULT] fold0 CV: 0.8313, LB: 0.797
+        - evidence + conclude
+            - exp114 [RESULT] fold0 CV: 0.8272, LB: 0.802
+        - evidence + conclude + rebuttal
+            - exp118 [RESULT] fold0 CV: 0.8295, LB: 0.801
+        - evidence
+            - exp108 [RESULT] fold0 CV: 0.8297, LB: 0.798
+        - claim 
+            - exp112 [RESULT] fold0 CV: 0.8351, LB: 0.786
+        - conclude 
+            - exp116 [RESULT] fold0 CV: 0.8223, LB: 0.800
+        - rebuttal 
+            - exp117 [RESULT] fold0 CV: 0.8238, LB: 0.797
+
+- found big bugged
+    - a lot of tokens had been incorrectly mapped
+    - fixed from exp114
+
+- evidence help model discriminate in lower score better
+    - but higher score still hard identify
+
+>- **exp114**:
+>    - add conclude (now have evidence and conclude)
+>    - [RESULT] fold0 CV: 0.8272, LB: 0.802
+
+>- **expp115**:
+>    - add position (now have evidence and position)
+>    - [RESULT] fold0 CV: 0.8313, LB: 0.797
+
+# 5.31
+
+>- **expp116**:
+>    - conclude only
+>    - [RESULT] fold0 CV: 0.8223, LB: 0.800
+
+- Maybe try training MLM to predict discourse type
+    - can massively reduce inferencing as it will be feeding the full essay
+        - thus, it will take sam amount of time as the score predictor
+    - mask all discourse type
+    - let mlm predict added special token
+
+>- **exp117**:
+>    - rebuttal only
+>    - [RESULT] fold0 CV: 0.8238, LB: 0.797
+
+- step of training mlm
+    - use masked text for training
+    - target: tokenized addtitional special token
+    - use cross-entropy
+
+- tasks for tmr
+    - train mlm model M001
+        - wish it can replace earlier discourse type predictor model
+
+# 6.1
+
+- fix out of memory
+    - Can not store out of fold prediction as its prediction contained 10k+ class
+    - evaluate only on valid loss
+    - It can be use as perplexity metric later
+- maybe I have to train mlm max_len 2048 to cover all sentence
+
+- finished inference mlm notebook
+    - have not write how ensemble goes yet
+    - as raw_output is too big to store within notebook ram
+
+- default training dataset is quite unique from usual essay. They are all text dependent essay
+    - Meaning that the range of vocabulary appear in the essay is limited to some point.
+    - They will be writing about sources which is different for general essay that giving opinions on topics
+    - Examples for general will be from experience or particularly created situation
+    - on the other hands, the example from source dependent essay will quoting  from sources more 
+
+- max_len 1024 is not enough, the prediction value will go shorter than number of sentence
+    - thus, go with 4096 to be safe as 2048 might not cover in some case
+    - how about none on max_len? it wil go to longest
+    - maybe 4096 is enough
+
+- would the model do better without [CLS] and [SEP] in every sentence?
+    - try later
+
+>- **exp118**:
+>    - 3 tokens (evidence and conclude, and rebuttal)
+>    - [RESULT] fold0 CV: 0.8295, LB: 0.801
+
+# 6.2
+
+- cleaning up dt_pred steps
+    - merge consecutive discourse type
+    - make sure LEAD and CONCLUDE remain only one in essay
+        - keep the first LEAD
+        - keep the last CONCLUDE
+        - maybe in MLM predictions is not necessary
+
+>- **exp119**:
+>    - 2 tokens (evidence and conclude)
+>    - use MLM predictions in Kaggle_only
+>    - score is a bit different because data was not sorted
+>        - out-of-fold is dfferent from previous exp
+>        - already fixed for the future exp
+>    - [RESULT] fold0 CV: 0.8300, LB: 0.783
+
+- Need to work on multi-folds ensembler on MLM prediction
+
+- Maybe `[CLS][MASK]...[SEP]` make model confused as someone has said it in the past competition
+    - yes, the one with `[CLS][MASK]...[SEP]` data is getting lower accuracy and higher loss
+
+# 6.3
+
+- since MLM predictions is a bit different from sen_discourse predictions
+    - need to check how removing consecutive discourse type influence CV and LB
+
+>- **exp120**:
+>    - add only evidence
+>    - using M005 large model fold0
+>    - remove consecutive discourse type on training time and inferencing time
+>    - [RESULT] fold0 CV: 0.8305, LB: 0.770
+
+- evidence only even lower together with conclude
+    - maybe MLM predictions included need different approach
+    - all predicted special tokens have contextual information of each others 
+    - unlike sen_discourse preditions which training and predicting seprately
+
+>- **exp121**:
+>    - add all tokens except unnanotated
+>    - using M005 large model fold0
+>    - remove consecutive discourse type on training time and inferencing time
+>    - [RESULT] fold0 CV: 0.83847, LB: 0.756
+
+>- **exp122**:
+>    - add evidence only
+>    - using M005 large model fold0
+>    - remove consecutive discourse type only on inferencing time
+>    - [RESULT] fold0 CV: 0.8377, LB: 0.787
+
+- maybe split '?' is not good
+- Should I add Unnanotated? in mlm?
+
+- M006:
+    - will included unannotated
+    - small model
+
+- tasks for tmr
+    - compare between predicted sen_discourse and predicted mlm
+
+# 6.4
+
+- I need better way to split sentence
+    - `nltk.tokenizer.sent_toknize` can do better job than `str.split('.')`
+    - lets see if speed would cause any problem
+    - remove consecutive discourse type on training time and inferencing time
+
+>- **exp123**:
+>    - add evidence only
+>    - using M006
+>    - remove consecutive discourse type only on inferencing time
+>        - [RESULT] fold0 CV: 0.8335, LB: 0.785
+>    - not remove anything
+>        - [RESULT] fold0 CV: 0.8335, LB: 0.786
+
+- maybe removing consecutive discourse type only on inferencing time is not necessary on mlm?
+    - lets try both
+
+- found bug in infer notebook where `pred0` is still being used
+
+- in discourse predictions, I finally found why it was taking so long to run
+    - run 1 batchsize and using only `collator` not `DataCollatorWithPadding`
+    - from 1 hrs 30 mins to 30 mins
+
+-  should go back to discourse predictions?
+    - since MLM is not working at all
+
+- still dont understand why MLM does worse than discourse type predictor
+    - with much higher F1 score and seemingly correctly labeled it made 
+
+# 6.5
+
+- maybe user-defined special tokens are harder for model to understand as it did not appear in pretrained before
+    - so instead of `[LEAD]` or `[EVIDENCE]` trying `<Lead>` or `<Evidence>` might make more sense
+
+>- **exp124**:
+>    - same as exp108
+>    - but using D012
+>        - similar to D005 but changed batch size from 32 to 16 and using multiple-samples dropout
+>    - [RESULT] fold0 CV: 0.8291, LB: 0.801
+
+>- **exp125**:
+>    - using D012
+>    - changed `[SPTOKEN]` -> `(SpToken)`
+>    - [RESULT] fold0 CV: 0.8301, LB: 0.799
+
+- note that loss of D005 is still the lowest at	0.6280
+    - while D011 at 0.6344 and D012 at 0.6353
+    - diff
+        - D005: bs 32
+        - D011: bs 16
+        - D012: be 16 multi-drop
+
+- been thinking about how final ensemble would look like
+    - 1st stage
+        - discourse type preditors
+            - which size?
+    - 2nd stage
+        - ensemble deberta trained with tokened_text
+        - ensemble deberta-v3 with different pooling strat trained with tokened_text
+            - mean pooling
+            - GEM pooling
+            - lstm pooling
+            - attention pooling
+        - ensemble deberta-v3 trained with mlm tokened_text?
+        - ensemble longformer  trained with tokened_text
+    - 3rd stage
+        - use ridge or lgb stacking
+
+
+- in auxiliary training
+    - maybe I can use prompt_name as different head
+    - from which layers
+
+>- **exp126**:
+>    - using D012
+>    - changed `[SPTOKEN]` -> `<SpToken>`
+>    - [RESULT] fold0 CV: 0.8332, LB: 0.800
+
+- D013
+    - same hparms as D012
+    - base model
+
+>- **exp127**:
+>    - using D013
+>    - changed `[SPTOKEN]` -> `<SpToken>`
+>    - [RESULT] fold0 CV: 0.8315, LB: 0.798
+
+- a fold of base model took 1 hour (D013) to submit
+    - maybe small model is a better choice for speed and performance
+
+
+- deciding whether go with `[TOKEN]`, `(TOKEN)`, or  `<TOKEN>`
+    - <> improved on CV and LB 
+    - [] worse on CV and better on LB 
+    - () better a bit on CV but worse on LB
+    - thus, going forward <> will be used
+
+- tasks for tmr
+    - train 1-3 fold of D012
+        - create new ko_sen
+    - while training, look through why MLM does not work
+    - investigate more about gap between CV and LB (start from past exps)
+
+# 6.6
+
+- how can I analyze MLM?
+    - maybe MLM need some threshold?
+    - threshold by recall?
+
+>- **exp128**:
+>    - add evidence only
+>    - using D012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8324, LB: 0.796
+>    - [RESULT] fold0 CV: 0.8392, LB: 0.810 (NM)
+>    - [RESULT] fold0 CV: 0.8375, LB: 0.805 (OPTUNA)
+
+>- **exp129**:
+>    - add conclude only
+>    - using D012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8224, LB: 0.797
+
+>- **exp130**:
+>    - add rebuttal only
+>    - using D012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8234, LB: 0.798
+
+>- **exp131**:
+>    - add lead only
+>    - using D012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8222, LB: 0.795
+
+>- **exp132**:
+>    - add position only
+>    - using d012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8228, LB: 0.798
+
+>- **exp133**:
+>    - add claim & counterclaim
+>    - using d012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8360, LB: 0.790
+
+
+- recap of D012_4folds
+    - Lead
+        - exp131 [RESULT] fold0 CV: 0.8222, LB: 0.795
+    - Position
+        - exp132 [RESULT] fold0 CV: 0.8228, LB: 0.798
+    - Claim & Counterclaim
+        - exp133 [RESULT] fold0 cv: 0.8360, lb: 0.790
+    - Evidence
+        - exp128 [RESULT] fold0 CV: 0.8324, LB: 0.796
+    - Concluding
+        - exp129 [RESULT] fold0 CV: 0.8224, LB: 0.797
+    - Rebuttal
+        - exp130 [RESULT] fold0 CV: 0.8234, LB: 0.798
+
+>- **exp134**
+>    - add position, evidence, concluding, rebuttal
+>    - using d012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8306, LB: 0.800
+
+>- **exp135**
+>    - add position, evidence, concluding, rebuttal, lead
+>    - using d012 4folds
+>    - based: exp126
+>    - [RESULT] fold0 CV: 0.8294, LB: 0.798
+
+# 6.8
+
+- so go without `<Lead>`
+
+- For discourse type predictor approach is settled.
+    - In exp134, it had shown consistency improvement both in CV and LB
+        - its based exp, exp094, [RESULT] fold0 CV: 0.8245, LB: 0.794 diff: 0.0305
+        - exp134 was [RESULT] fold0 CV: 0.8306, LB: 0.800, diff: 0.0306
+    - 4 folds of D012
+    - chose position, evidence, concluding, rebuttal
+        - meaning that, excluded lead, claim, counterclaim
+    - maybe hparams like betas and lr still needs a bit of adjustment
+
+- There are something I want to try before go full-scale
+    - why MLM is not working?
+        - maybe single fold is too bias and simply not enough despite its performance
+            - testing by train 4 folds and select only position, evidence, concluding, rebuttal
+            - maybe `[TOKEN]` and `<Token>` diffrence?
+            - if this does not work out, I have to leave this approach
+        - maybe the preprocess and postprocess might had been done inconsistently and incorrectly
+            - checked: done the same 
+            - changed to how dt predictor steps (split by '.')
+    - GroupKFold split
+        - To make sense out of this approach, I have to train 7 splits based on each topics
+        - This will take incredibly amount of time to train as large model takes around 4 hours per fold to train
+
+- M007
+    - small model
+    - 4 folds
+
+
+>- **exp136**:
+>    - using M007
+>    - split the same as dt predictor
+>    - add position, evidence, concluding, rebuttal
+>    - using `<Token>`
+>    - [RESULT] fold0 CV: 0.8326, LB: 0.793
+
+- okay, not working. lets move on
+
+>- **exp137**:
+>    - using D012
+>    - add position, evidence, concluding, rebuttal (4 defaults)
+>    - increase from 3 to 4 epoch
+>        - for comparing AWP later
+>    - [RESULT] fold0 CV: 0.8341, LB: 0.797
+>        - overfitting?
+
+- tried sub with pure feats lgbm
+    - CV: 0.807 , LB: 0.802
+
+- have to clean up infer notebook a bit where replace class to `<token>`
+    - done
+
+- try awp?
+
+>- **exp138**:
+>    - based: exp134
+>    - start awp at 2 out of 3
+>    - [RESULT] fold0 CV: , LB:
+>    - train loss increasing nonstop
+>        - pick wrong lr or eps?
+>        - Ex. from others adv_lr = 0.0001 adv_eps = 0.01 (not in this exp)
+
+# 6.9
+
+- **exp139**:
+    - based: exp134
+    - added 'Holistic esssay score [SEP]' at the start of every essay
+    - [RESULT] fold0 CV: 0.8285, LB:
+        - don't need to submit because even it improved on LB, I will use it anyway
+
+- try SiFT?
+
+>- **exp140**:
+>    - based: exp134
+>    - try SiFT from last 2 epochs out of 3 epochs
+>    - [RESULT] fold0 CV: , LB:
+>    - maybe adversial training is not working
+>        - SiFT also increased train loss a lot and took up to 3 times longer than usual
+>        - This is not practical for larger model
+
+>- **exp141**:
+>    - based: exp134
+>    - pretrain MLM first 2 epoch
+>    - load that model and train like usual
+>    - [RESULT] fold0 CV: , LB:
+>    - cannot get it to work
+
+- start trying different pooling
+    - LSTM
+    - Attention
+    - GeM
+    - Concat last 4
+    - WeightedLayer?
+
+>- **exp142**:
+>    - based: exp134
+>    - 4 defaults
+>    - LSTM pooling
+>    - [RESULT] fold0 CV: 0.8166, LB: 0.794
+
+>- **exp143**:
+>    - based: exp134
+>    - 4 defaults
+>    - Attention pooling
+>    - [RESULT] fold0 CV: 0.8340, LB: 0.793
+
+>- **exp144**:
+>    - based: exp134
+>    - 4 defaults
+>    - GeM pooling
+>    - [RESULT] fold0 CV: 0.8350, LB: 0.799
+
+>- **exp145**:
+>    - based: exp134
+>    - 4 defaults
+>    - Concat last 4 layrs pooling
+>    - [RESULT] fold0 CV: 0.8338, LB: 0.793
+
+- maybe others pooling needs different set of discourse type
+
+# 6.10
+
+>- **exp146**
+>    - based: exp134, exp143
+>    - instead of 4 defaults, go with evidence and conclude
+>    - Attention pooling
+>    - [RESULT] fold0 CV: 0.8301, LB: 0.795
+
+- put question in front of essay?
+    - to do that, prompt_name predictor needs to be included
+    - predict what the prompt name -> map with prepared questions
+
+>- **exp147**
+>    - add assignment at the beginning
+>        - `<Assignment>` assignment `[SEP]` `<Essay>` essay
+>    - [RESULT] fold0 CV: 0.8296, LB: 
+>        - did not submit because even LB is better I won't be using it
+
+>- **exp148**
+>    - using groupKfold split 7 base on prompt_name instead
+>    - 4 defaults and mean pooling first
+>    - [RESULT] fold0 CV: 0.762, LB: 
+    
+>- **exp149**
+>   - same as exp134 but 4 folds
+>   - [RESULT] 4folds CV: 0.8321, LB: 0.802
+>   - [RESULT] 4folds CV: 0.8383, LB: 0.808 (OPTUNA) upper
+>   - [RESULT] 4folds CV: 0.8391, LB: 0.808 (NM)
+
+- comparing exp094 vs exp149
+    - exp094
+        - [RESULT] 4folds CV: 0.8220, LB: 0.797
+         -[RESULT] 4folds CV: 0.8299, LB: 0.805 (OPTUNA)
+    - exp149
+        - [RESULT] 4folds CV: 0.8321, LB: 0.802
+        - [RESULT] 4folds CV: 0.8383, LB: 0.808 (OPTUNA)
+
+
+- max length of essay is 1536 
+
+- What can add to lgbm features
+    - from tokened_text
+        - discourse types count
+    - from nltk_eng
+        - POS tag count
+        - simple, past, future tense
+    - variety of sentence structures count
+    - total type of sentence structures
+
+- how can I identify that quoting, mention, or taking from source text
+
+- Should I try remove all discourse type and train with attention first?
+
+>- **exp150**
+>    - train without any discourse type to compare with next exp
+>    - Attention pooling
+>    - [RESULT] fold0 CV: 0.8202, LB: 0.788
+
+
+>- **exp151**
+>    - train with evidence only
+>    - Attention pooling
+>    - [RESULT] fold0 CV: 0.8300, LB: 0.792
+
+
+- task for tmr
+    - make train lgbm save oof_df for optimizing
+    - check if oof_df and splits in train_lgbm leak or not
+    - maybe think about using persuade 2.0 in training both NN and lgbm
+        - try 7 GroupKFold with persuade 2.0?
+    - check diff between tokened_text and full_text
+        - not many
+    - submit add_pos_tagged
+
+>- exp149 + lgbm
+>    - [RESULT] CV: 0.8336, LB: 0.812
+>    - CV+0.0015, LB 0.01
+>    - so using stacking in leakage free manner worked!
+
+>- **exp152**
+>    - based: exp134
+>    - everything is the same except no warmup (following chris baseline)
+>    - [RESULT] fold0 CV: 0.8317, LB: 0.800
+>    - full-precision sorting in public score is higher than exp143.
+>        - go without warmup
+
+# 6.11
+
+>- **exp153**
+>    - based: exp152
+>    - expand to 4 epoch
+>    - [RESULT] fold0 CV: 0.8334, LB: 0.805
+>    - but why warmup 0.1 make it worse?
+
+- not submitted features
+    - pos_tag (nltk features)
+        - CV+0.002 from pure_feats
+    - discourse type features
+        - CV+0.002 from nn_feats
+
+- I can add non-overlapping persuade in lgbm later
+    - split 4 folds with multilabelstratifiedkfold as usual
+    - then split 4 folds non-overlapping persuade seperately
+        - these raw_preds (soft labels) will be coming from simple mean ensemble of all models
+
+- finished FB3 features notebook
+    - don't forget to add to lgbm notebook
+
+- Try SWA or EMA
+
+>- **exp154**
+>    - based: exp153
+>    - 4 epoch 
+>    - apply EMA
+>    - [RESULT] fold0 CV: 0.8347, LB: 0.793
+
+- lgbm added POS_tag
+    - CV: 0.8091, LB: 0.800
+    - CV:+0.002 , LB:-0.002
+
+# 6.12
+
+- revisit AWP
+
+- EMA does not help
+
+>- **exp155**
+>    - based: exp153
+>        - as ema does not help, this exp will base on exp153
+>    - 4 epoch start from 3rd epoch
+>    - adv_lr 1e-4, adv_eps 1e-2
+>    - [RESULT] fold0 CV: , LB:
+>    - same, train loss increasing non-stop
+
+- exp140+nn_feats+dt_count+fb3_feats
+    - before selected CV: 0.8385
+    - CV: 0.8368, LB: 0.815
+    - no select CV: 0.8376, LB: 0.816
+
+>- **exp156**
+>    - based: exp153
+>    - max_grad_norm from 1.0 to 10
+>    - [RESULT] fold0 CV: 0.8319, LB:
+>    - overfitting at the last epoch, this result is from 3rd epoch
+ 
+>- **exp157**
+>    - based: exp153
+>    - change lr from 1e-5 to 2e-5
+>    - [RESULT] fold0 CV: 0.8297, LB:
+
+>- **exp158**
+>    - based: exp153
+>    - change linear to cosine scheduler
+>    - [RESULT] fold0 CV: 0.8326, LB:
+
+
+- This might be optimal hparams
+    - linear decay no warmup
+    - lr 1-e5
+    - 4 epoch
+    - weight_decay 0.01
+    - batch size 8
+    - gradient clip 1.0
+
+- time to scale up?
+- spend time cleaning incorrectly placed discourse type? 
+    - too much to process
+
+- tasks for tmr
+    - train base model
+        - start with single fold see if tuning needed
+    - write ridge model notebook while waiting
+        - wrote one but reaaly bad result
+        - train more model adn revisit again
+
+# 6.13
+
+>- **exp159**
+>    - try base model
+>    - based: exp153
+>    - [RESULT] fold0 CV: 0.8363, LB: 0.792
+>    - [RESULT] fold1 CV: 0.8391, LB: 0.796
+>    - don't know why base model is different from others
+>        - It was reportedly a bit off 
+>        - maybe lower learning rate? because it get ovefiting
+
+- if adding persuade in stacking worked, would adding fb3 data in stacking worked too?
+    - because lgbm relying less on topics
+    - try persuade first then add fb3 later
+    - Can I use FB3 data?
+        - need to check licensing
+
+- recap on lgbm
+    - (s) selected_feats, (ns) no_selected_feats
+    - pure_feats (s)
+        - CV: 0.8073, LB: 0.802
+
+    - pure_feats + pos_tag (s)
+        - CV: 0.8091, LB: 0.800
+
+    - pure_feats + fb3_feats (s)
+        - (ns) 0.8134
+        - CV: 0.8131, LB: 0.804
+
+    - pure_feats + dt_count (s)
+        - CV: 0.8180, LB: 0.801
+        
+    - pure_feats + nn (s)
+        - CV: 0.8336, LB: 0.812 
+
+    - pure_feats + nn + dt_count (s)
+        - CV: 0.8356, LB: 
+
+    - pure_feats + nn + fb3 (s)
+        - CV: 0.8325, LB: 0.809
+
+    - pure_feats + nn + dt_count + fb3 (s)
+        - CV: 0.8368, LB: 0.815
+
+    - pure_feats + nn + dt_count + fb3 (ns)
+        - CV: 0.8376, LB: 0.816
+
+    
+
+- colab compute unit
+    - T4: 1.76/hr 
+        - most efficient but took long for large model
+        - 4 folds of large model will be around 36 credit
+        - 1 fold takes 12 hours (might to train 1 fold/day)
+    - L4: 4.82/hr
+        - might be a good trade off
+        - 4 folds of large model will be around 48 credit
+        - 1 fold takes 6 hours (might to train 2 folds/day)
+    - A100: 11.77/hr
+        - might have to use when time is running out
+        - 4 folds of large model will be around 56 credit
+        - 1 fold takes 1-2 hours (4 folds/day)
+
+
+>- **exp160**
+>    - large model
+>    - [RESULT] fold0 CV: 0.8362, LB: 0.792
+>    - time on colab
+>        - 6/13 18:17, CU 87.47 
+>        - 6/13 19:42, CU 70.91
+>        - took around 1hr and 25 minues with 16.56 CU used
+>    - maybe try lower learn rate?
+>        - 5-e6
+
+>- **exp161**
+>    - large model
+>    - lower learn rate to 5e-6 from 1e-5 
+>    - [RESULT] fold0 CV: 0.843298, LB: 0.795
+>    - time on colab
+>        - 6/13 20:00, CU 70.91
+>        - 6/14 01:08, CV 47.64
+>        - L4 ended up use more CU
+>        - took 5 hr and 8 minutes with 23.27 CU used
+
+- considering freezing layer 
+    - large model has 24 layers
+    - base model has 12 layers
+    - small model has 6 layers
+
+- tasks for tmr
+    - submit pure_feats + nn + fb3 (s)
+    - submit exp161
+
+# 6.14
+
+>- **exp162**
+>    - large model
+>    - lr 5-e6
+>    - freezed 12 top layers
+>    - [RESULT] fold0 CV: 0.843205, LB:
+
+- if there is submit left submit pure_feats + nn + dt_count
+    - in trian-lgbm-ds
+
+>- **exp163**
+>    - large model
+>    - lr 5-e6
+>    - reduced to 3 epoch from 4 epoch
+>        - maybe 4 epoch is causing overfitting?
+>    - [RESULT] fold0 CV: 0.84266, LB: 0.799
+
+>- **exp164**
+>    - large model
+>    - lr 5-e6
+>    - 3 epoch
+>    - redcue batch_size to 4 from 8
+>    - [RESULT] fold0 CV: 0.8444, LB: 0.783
+
+>- **exp165**
+>    - large model
+>    - lr 5-e6
+>    - 4 epoch
+>    - batch_size 4
+>    - [RESULT] fold0 CV: 0.842317, LB: 0.795
+
+- quick recap large model
+    - exp166 lr 1e-5, epoch 3, bs 8 -> fold0 CV: 0.8437  , LB: 0.803 
+    - exp163 lr 5e-6, epoch 3, bs 8 -> fold0 CV: 0.84266 , LB: 0.799
+    - exp165 lr 5e-6, epoch 4, bs 4 -> fold0 CV: 0.842317, LB: 0.795
+    - exp161 lr 5e-6, epoch 4, bs 8 -> fold0 CV: 0.843298, LB: 0.795
+    - exp160 lr 1e-5, epoch 4, bs 8 -> fold0 CV: 0.8362  , LB: 0.792
+    - exp164 lr 5e-6, epoch 3, bs 4 -> fold0 CV: 0.8444  , LB: 0.783
+
+>- **exp166**
+>    - moving toward exp163
+>    - large model
+>    - lr 1e-5
+>    - 3 epoch
+>    - batch_size 8
+>    - LLRD*0.9
+>    - [RESULT] fold0 CV: 0.8437, LB: 0.803
+
+# 6.15
+
+- exp166 have almost the same hyperpaarmeters as exp149
+    - except warmup being 0.0 not 0.1 in exp149
+    - I want to tuning hparams a bit more
+    - let's change 1e-5 to 2-e5
+    - after that, lets try diff lr 1-e5 on encoder and 2-e5 on decoder
+    - lastly LLRD 1e-5 but *0.95 instead of 0.9
+    - can't go with 4 epoch, because it will cause overfitting? then do with 3 epoch
+
+>- **exp167**
+>    - comparing with exp152
+>    - back to small model
+>    - LLRD 2-e5
+>    - 3 epoch
+>    - [RESULT] fold0 CV: 0.8347, LB: 0.796
+
+>- **exp168**
+>    - Diff LR Encoder: 1-e5, Decoder: 2-e5
+>    - [RESULT] fold0 CV: 0.8331, LB:
+
+>- **exp169**
+>    - LLRD 3-e5
+>    - [RESULT] fold0 CV: 0.8319, LB:
+
+- Maybe I should newly create training dataset from D012
+    - No need to use nko_sen, all data will from infer_discourse
+    - So data is more consistent in term of preprocessing, training and inferencing
+
+- might have to go to square one which discourse type to choose
+
+>- **exp170**
+>    - use new fully predicted from D012
+>    - start with evidence
+>    - replicated hparams from exp152
+>    - [RESULT] fold0 CV: 0.8224, LB: 0.797
+
+>- **exp171**
+>    - use new fully predicted from D012
+>    - 4 defaults dt
+>    - replicating exp152
+>    - [RESULT] fold0 CV: 0.8241, LB: 0.801
+
+>- **exp172**
+>    - use new fully predicted from D012
+>    - 4 defaults dt
+>    - LLRD from 1e-5 to 2e-5
+>    - [RESULT] fold0 CV: 0.8243, LB: 0.795
+
+>- **exp173**
+>    - 4 defaults dt
+>    - dataset created entirely from M007
+>    - based: exp171
+>    - [RESULT] fold0 CV: 0.8248, LB: 
+
+- maybe dataset fully created by D012 or M007 working better than the original one
+    - stick to orignal where half of them from persuade 1.0/2.0
+
+>- **exp174**
+>    - original tokened_text dataset
+>    - based: exp152
+>    - trying Huberloss instead of MSE
+>    - [RESULT] fold0 CV: 0.8318, LB: 0.802
+
+- put warmup 0.1 back on?
+
+# 6.16
+
+- so using huberloss is good?
+    - note that loss must be *2 when comparing to mse
+
+>- **exp175**
+>    - use new fully predicted from D012
+>    - comparing with exp171 
+>    - 4 epoch
+>    - so 4 epoch not really good for the strategy
+>    - [RESULT] fold0 CV: 0.8242, LB: 0.799
+
+>- **exp176**
+>    - use huber with warmup 0.1
+>    - 3 epoch
+>    - [RESULT] fold0 CV: 0.8308, LB: 0.801
+>    - without warmup is CV0.001 and LB0.001 higher 
+
+- should look into max_len more, currently using 2048
+
+>- **exp177**
+>    - huber loss
+>    - layerwise_lr_decay 0.95
+>    - [RESULT] fold0 CV: 0.8332, LB: 0.804
+>    - CV and LB increased almost at the same amount
+>        - from exp174 fold0 CV: 0.8318, LB: 0.802
+
+>- **exp178**
+>    - huber loss
+>    - layerwise_lr_decay 0.975
+>    - [RESULT] fold0 CV: 0.8321, LB:
+
+>- **exp179**
+>    - huber loss
+>    - layerwise_lr_decay 0.95
+>    - LLRD 2-e5
+>    - [RESULT] fold0 CV: 0.8329, LB:
+
+>- **exp180**
+>    - huber loss
+>    - layerwise_lr_decay 0.95
+>    - LLRD 1.5-e5
+>    - [RESULT] fold0 CV: 0.8355, LB: 0.800
+
+>- **exp181**
+>    - large model 4 folds
+>    - based: 177
+>    - start: CU 77.72 at 6/16, 21:49
+>    - end:   CU 27.70 at 6/17, 02:05
+>    - used:  CU 50.02 took 4 hrs 16 mins
+>    - [RESULT] 4 folds oof CV: 0.8436, LB: 0.802
+>    - [RESULT] fold0 CV: 0.8363, LB: 0.798
+>    - [RESULT] fold1 CV: 0.8465, LB: 0.798
+>    - [RESULT] fold2 CV: 0.8466, LB: 0.796
+>    - [RESULT] fold3 CV: 0.8448, LB: 0.794
+>    - submit D012+exp181 took around just over 1 hour
+
+# 6.17
+
+>- **exp182**
+>    - huberloss
+>    - 4 epoch
+>    - small model
+>    - LLRD 1e-5 decay *0.95
+>    - [RESULT] fold0 CV: 0.8326, LB: 
+>        - from the 3rd epoch out of 4 epoch
+>    - maybe decay *0.95 is pushing too hard
+
+>- **exp183**
+>    - huberloss
+>    - hparams are same as 166 except the loss
+>    - start: CU 127.61 at 6/17, 15:09
+>    - end:   CU  77.58 at 6/17, 19:23
+>    - used:  CU  50.03 took 4 hrs 15 mins
+>    - [RESULT] 4 folds oof CV: 0.8452, LB: 0.806
+
+
+- wanted to try longformer-base but not really worth it 
+    - if train, will go with lonformer-large
+
+- **exp184**
+    - replacing exp149
+    - following exp153 setup
+        - 4 epoch
+        - no warmup
+        - lr 1-e5
+        - max_len 2048
+    - [RESULT] 4 folds oof CV: 0.8352, LB: 
+
+- the last submission time limit
+    - currently have
+        - 4 folds of 1 small DT model (This took around 10 mins)
+        - 4 folds of 1 small model (This took around 25 mins)
+            - current exp149 replacing with exp184 if it is better
+        - 4 folds of 2 large models (1 model took aroudn 1 hr)
+        - 4 folds of 1 lgbm model (takes around 7-10 mins)
+    - if include everything excluding large model will take approximately
+        -  2 hrs and 45 mins
+    - so maybe last submission can fit around 5-7 large models
+    - check real time tmr
+
+- What models to train next?
+    - deberta-large
+    - deberta-v3-base
+    - longformer-large
+    - distilled-roberta-uncased?
+
+# 6.18
+
+- exp183_4f submit time 
+    - at 09:16
+    - finished 10:27
+    - took around 1 hr and 11 mins
+
+- exp149+exp181+exp184 submit time
+    - at 09:16
+    - finished 11:46
+    - took around 2 hr and 30 mins
+
+- exp184 when ensemble with all others exp it gave lower CV
+    - it can't replace 149
+
+- what exp that have not submitted yet?
+    - lgbm pure_feats with persuade
+    - pure_feats + nn + dt_count (s)
+
+- see exp149+exp181+exp184 result then decide what to do next
+    - longformer-large and deberta-large can not train on kaggle
+        - can but with loss accumulation
+    - Roberta-large could be able to fit in P100 ram
+
+- exp149+exp181+exp184
+    - CV: 0.848144
+    - LB: 0.808
+
+>- **exp185**
+>    - small model
+>    - classification with class weight
+>    - [RESULT] fold0 CV: 0.8281, LB: 
+>    - did not pick the last epoch (this reuslt is from 2nd epoch)
+
+>- **exp186**
+>    - deberta-large
+>    - start: CU 77.58 at 6/18, 13:32
+>    - end:   CU 22.40 at 6/18, 18:15
+>    - used:  CU 55.18 took 4 hrs and 43 mins
+>    - [RESULT] 4 folds oof CV: 0.8483, LB: 0.797
+
+- maybe I should train 1 large with plain data, just for safety
+
+- fb3+dt_count+149+181+183+186
+    - (s)  CV: 0.8537, LB: 0.821
+    - (ns) CV: 0.8541, LB: 0.819
+    - This result CV is incorrectly calculated because it was wrongly splitted
+    - submission time:
+        - start: 17:05
+        - end: 20:33
+        - took 3 hr and 28 mins
+- pure_feats+149+181+183+186
+    - CV: 0.8549, LB: 0.817
+
+# 6/19
+
+- Recap left tasks (what I can do in the last 2 weeks)
+    - train more models
+        - longformer-large (colab)
+        - deberta-v3-large using mse and GeMPooling (colab)?
+
+        - distilbert-base-uncased (kaggle)
+            - train 2 folds in one run
+        - deberta-v3-base (kaggle) (if have time left)
+            - train 2 folds in one run
+
+    - inferencing soft-label on NOL data from Persuade to include in lgbm model
+        - have to inference from all trained model
+        - this will be almost last step to do after trained all models
+
+- fb3_feats is potentially leak
+    - the model was trained on feedback1 which is the same data
+        - some were not exclude
+    - it is indirect leakage because it does not directly target the y
+        - leakage from knowledge distilled pseudo labelling 
+
+- found bugs that mskf was split differently on NN and lgbm because of order of dummies columns 
+- fixed leakage (bugs)
+    - (s)  CV: 0.85487, LB: 0.822
+    
+
+- tasks for tmr
+    - train longformer-large
+    - looking more for features
+
+
+# 6.20
+
+- pure_feats+persuade with LB 0.810 was 15 folds
+    - while 4 folds is only 0.805
+    - increase folds should help in efficiency track
+
+>- **exp187**
+>    - large model
+>        - gempooling
+>        - mse
+>    - start: CU 113.36 at 6/20, 13:41
+>    - end:   CU  62.35 at 6/20, 17:58
+>    - used:  CU  51.01 took 4 hrs and 17 mins
+>    - [RESULT] 4 folds oof CV: 0.8452, LB: 0.799
+
+- don't know why longformer-large give nan loss
+    - skip for now
+    - set autocast to bfloat16 should help
+
+- bigbird-large
+    - loss does not decrease
+
+- lgbm+persuade 15 folds
+    - CV: 0.8519, LB: 0.807
+    - only around 4 minutes
+
+- what model to train next
+    - longformer-large
+    - deberta-v3-large (cls)
+    - deberta-v3-base
+
+- fb3+dt_count+149+181+183+186+187
+    - CV: 0.8557, LB: 0.819
+    - this took around 4 and 20 mins
+        - can fit 3-4 large models more
+
+- task for tmr
+    - train longformer, this time wiht dtype=bfloat16
+    - decide whether to replace 181 with proper one
