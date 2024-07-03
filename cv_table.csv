@@ -1,0 +1,6 @@
+model_num," model_name",note," fold_0"," fold_1"," fold_2"," fold_3"," oof",public
+exp181,"deberta-v3-large","huber_loss, lr_decay 0.95","0.83637","0.84654","0.84660","0.84487","0.84362",0.802
+exp186,"deberta-large",,"0.84634","0.84623","0.85516","0.84567","0.84839",0.797
+exp187,"deberta-v3-large",gem pooling,"0.84229","0.84475","0.85143","0.84234","0.84523",0.799
+exp188,"longformer-large",,"0.83744","0.83544","0.84183","0.82966","0.83610",0.798
+exp197,"deberta-base",attention pooling,"0.83544","0.83634","0.84462","0.82870","0.83633",0.804
