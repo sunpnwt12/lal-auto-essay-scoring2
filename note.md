@@ -2595,3 +2595,457 @@
 - task for tmr
     - train longformer, this time wiht dtype=bfloat16
     - decide whether to replace 181 with proper one
+
+# 6.21
+
+- **exp188**
+	- longformer-large
+	- 24-layer, 1024-hidden, 16-heads, ~435M parameters
+	- start: CU 162.35 at 6/21, 15:07
+	- end: CU 82.43 at 6/21, 21:56
+	- used: CU 79.92 took 6 hrs 49 mins
+	- [RESULT] 4 folds oof CV: 0.8427, LB: 0.798
+
+- maybe I don't need mean pooling mse?
+	- huberloss is almost the same except it will penelize heavily when loss goes high (like mae)
+	- in general, it will act like mse
+
+- when kaggle gpu reset
+	- train deberta-v3-large (cls) (this will use around 16-17 of gpu hours)
+    	- use 1024 max len for speed (maximize effiency)
+
+- potential improve over lgbm
+	- try different hyperameters on lgbm
+		- train tonight
+	- try universal sentence encoder
+	- add soft label to fb3 train data
+		- add to efficiency track lgbm
+
+- task for tmr
+	- train deberta-v3-large (cls)
+
+# 6.22
+
+> - **exp189**
+>   - bigbird-roberta-large
+>   - this time wiht bfloat16
+>     - attention_type = 'original_full' is not working
+>     - try sparse_block
+>     - still no working, training loss constantly going up
+>       - maybe because mask format is `<>` while others is `[]`
+>   - [RESULT] 4 folds oof CV: , LB:
+
+> - **exp190**
+>   - try classification model
+>   - multi-dropout on
+>   - xsmall model
+>   - [RESULT] fold0 CV: 0.8136, LB: 0.782
+
+> - **exp191**
+>   - try 'funnel-transformer/small'
+>   - diff lr e: 1-e5, d: 2-e5
+>   - [RESULT] fold0 CV: 0.83381, LB: 0.798
+
+> - **exp192**
+>   - try 'funnel-transformer/small'
+>   - diff lr e: 1-e5, d: 1-e5
+>   - [RESULT] fold0 CV: 0.8341, LB: 0.800
+>   - [RESULT] fold2 CV: 0.8373, LB:
+
+- task for tmr
+    - train funnel-transformer
+        - done
+    - convert .bin to .plk for eff track
+        - done
+        - not submitted yet
+    - check data diff in merge_data notebook for eff
+        - checked
+
+> - **exp193**
+>   - funnel-transformer/large
+>   - 26 layers: 3 blocks of 8 layers then 2 layers decoder, 1024-hidden, 12-heads, 386M parameters
+>   - start: CU 70.89 6/23 at 12:50
+>   - end: CU 41.30 6/23 at 15:23
+>   - used: CU 29.59 took 2 hrs and 32 mins
+>   - [RESULT] 4folds CV: 0.8361, LB: 0.796
+
+# 6.23
+
+- try classication
+
+> - **exp194**
+>   - diff lr e: 1e-5, d: 2e-5
+>   - max_len 1024
+>   - multidropout
+>   - [RESULT] fold0 CV: 0.8287, LB: 0.793
+
+> - **exp195**
+>   - diff lr e: 1e-5, d: 2e-5
+>   - max_len 2048
+>   - multidrpopout
+>   - concat pooling
+>   - [RESULT] fold0 CV: 0.82885, LB: 0.796
+
+- funnel-transformer/large did not increase CV nor LB
+- what's left
+
+  - cls model (deberta-v3-large concat)
+    - kaggle 2 folds per run
+  - deberta-v3-base
+    - next week?
+  - if time left try out oof from persuade1.0
+
+- task for tmr
+  - submit exp195 see result
+    - decide whether to train large model following the setup
+  - submit eff
+  - train longformer-base
+    - this will use up all colab credit
+
+# 6.24
+
+- mixing different pooling layer seems interesting
+
+> - **exp196**
+>   - deberta-v3-large
+>   - classification
+>   - concat last 4 layers
+>   - [RESULT] 4 folds CV: 0.8416, LB: 0.805
+
+- when training lgbm included NOL persuade
+
+  - validation should not include NOL persuade?
+
+    - since it can train on cpu, take a bit of time should not be a problem
+
+  - so it would look like this
+
+    - train set
+      - default[1, 2, 3] + NOL_persuade[1, 2, 3]
+    - valid set
+      - default[0]
+
+  - doing this to prevent from over optimistic CV and leakage
+
+- if train base model on kaggle it would take around 2 hours per fold
+
+  - 8 hrs for the model
+  - it'd better use another pooling layer
+    - attention?
+    - was thinking about LSTM but it gave not so good result on CV
+
+- be careful with order of features in lgbm
+
+- task for tmr
+  - try including NOL persuade in lgbm
+  - looking into optim notebook for next model
+    - maybe deberta-base? or longformer-base?
+  - submit new eff
+    - done LB: 0.805
+      - stick to the last one
+
+# 6.25
+
+- maybe there is bug where selected_features.yaml is loaded, the order of features is also swapped
+  - importance features go up to the first of the row
+  - when using non-selective features
+    - the order will follow generating order
+  - when using seletive features
+    - input order will follow selected_features.yaml
+    - model will take what ever will take what ever it get because it is numpy
+    - to make ensure the safety, predictor needs validate_features=True on
+
+> - **exp197**
+>   - deberta-base
+>   - max_len 1024
+>   - attention pooling
+>   - [RESULT] 4 folds CV: 0.8363, LB: 0.804
+
+- task for tmr
+  - combine exp197 and submit
+  - explore more about ensemble
+  - note for last submit
+    - 1 for eff
+    - 1 for highest CV
+    - 1 for highest LB
+
+# 6.26
+
+- when add cls model
+
+  - the CV is increase
+  - but LB is slightly decrease
+
+- recap stacking (all of these model included fb3 + dt)
+  - 181 + 186 + 187 + 188
+    - (s) CV: 0.85574, LB: 0.823
+    - (ns) CV: 0.85725, LB: 0.823 (higher pos) (currently highest LB)
+
+  - 181 + 186 + 187 + 188 (clip)
+    - (s) CV: 0.85622, LB:
+    - (ns) CV: 0.85772, LB: 0.821
+      - forgot to clip in infer notebook?
+      - resub tmr?
+
+  - 181 + 186 + 187 + 188 (new_vec)
+    - (s) CV: 0.85610, LB:
+    - (ns) CV: 0.85526, LB:
+
+  - when included exp196 (cls) model
+    - 181 + 186 + 187 + 188 + 196
+      - (s) CV: 0.85866, LB: 0.819
+      - (ns) CV: 0.85552, LB: 0.816
+    - 181 + 186 + 187 + 188 + 196 (up_vocab)
+      - (s) CV: 0.85912, LB: 0.820
+      - (ns) CV: 0.85764, LB:
+
+- try stacking without fb3 or without dt ot without any of those
+
+  - some reported that fb3 increase CV but decrease LB
+  - (s) 18_000
+  - dt + 181 + 186 + 187 + 188
+    - (s) CV: 0.85718, LB: 0.821
+    - (ns) CV: 0.85536, LB:
+
+  - fb3 + 181 + 186 + 187 + 188
+    - (s) CV: 0.85593, LB: 0.821
+    - (ns) CV: 0.85436, LB:
+
+  - pure + 181 + 186 + 187 + 188
+    - (s) CV: 0.85654, LB: 0.818
+    - (ns) CV: 0.85537, LB:
+
+- today submit
+
+  - train both ns and s, then choose one with higher
+    - as its always get better result
+
+  1. fb3 + dt + 181 + 186 + 187 + 188 (ns) (clip) - submitted
+  2. dt + 181 + 186 + 187 + 188 (s) - submitted
+  3. fb3 + 181 + 186 + 187 + 188 (ns or s)? - submitted
+  4. pure_feats + 181 + 186 + 187 + 188 - submitted
+  5. fb3 + dt + 181 + 186 + 187 + 188 (new_vec) - submitted
+
+- if clipped model get better result then re-train lgbm with clipped method
+
+  - maybe have to do it tmr
+
+- might have to fix count vector and tf-idf later, but stick to this for a while just for comparison
+
+  - or remove them altogether
+  - there were report that almot half these features have zero features_important
+  - or even input word an char vector
+
+- task for tmr
+  - resub oof clip model
+    - done - nothing changed
+
+# 6.27
+
+- need to test how effective count_vec and tfidf_vec
+
+- fb3 + dt + 181 + 186 + 187 + 188 (16_500)
+  - CV: 0.85816, LB: 0.820
+
+- fb3 + dt + 181 + 186 + 187 + 188 + 197 (no_vec)
+  - CV: 0.85911, LB: 0.823
+
+- without count_vec and tfidf_vec
+  - fb3 + dt + 181 + 186 + 187 + 188
+    - (ns) CV: 0.85823, LB: 0.820
+
+  - fb3 + dt + 181 + 186 + 187 + 188 + 197
+    - (ns) CV: 0.85911, LB: 0.823
+
+- last 2 submits of today
+
+  - fb3 + dt + 181 + 186 + 187 + 188 + 197 (tfidf (3, 6) only)
+    - CV: 0.85736, LB: 0.823
+  - fb3 + dt + 181 + 186 + 187 + 188 + 197 (count (2, 3) only)
+    - CV: 0.85741, LB: 0.824 (close to 0.825)
+
+- fb3 + dt + 181 + 186 + 187 + 188 + 197 (new_count (1, 1) only)
+  - CV: 0.85951, LB:
+
+# 6.28
+
+- 4 days left
+- deadline is 3 july 2024, 06.59
+  - so last selected should be done in 2 july midnight
+
+- what to sub today?
+
+  1. fb3 + dt + 181 + 186 + 187 + 188 + 197 (new_count (1, 1) only)
+     - CV: 0.85951, LB: 0.822
+
+  2. fb3 + dt + 181 + 186 + 187 + 188 + 197 (count (1, 3) only)
+     - CV: 0.85862, LB: 0.821
+
+  3. fb3 + dt + 181 + 186 + 187 + 188 + 197 (new_tfidf (1, 5) max=100)
+     - CV: 0.85867, LB: 0.823
+
+  4. fb3 + dt + 181 + 186 + 187 + 188 + 197 (tfidf (3, 6) max=300)
+     - CV: 0.85828, LB: 0.822
+
+  5. fb3 + dt + 181 + 186 + 187 + 188 + 197 (count (2, 3)) (up_v)
+     - CV: 0.85838, LB:
+
+- Not sure why incorrected one is better than corrected one?
+
+  - minimize features number using max_features help a lot
+    - new_count (1, 1)
+      - CV: 0.85951, LB: 0.822
+    - new_tfidf (1, 5) max=100
+      - CV: 0.85867, LB: 0.823
+
+- just realized that exp197 did not submit yet
+  - submit if slot left, or maybe after competition end
+
+- today I just submit all type of vec
+  - all of theem generated and selected by the best CV score
+    - potential ovefit can not ignore
+  - let's see how they perform
+  - up vocab is not used yet
+
+- try train 5 epoch of small model
+  - concat 4 lasy layers
+  - train on gpu reset
+
+- task for tmr
+  - decided what to do next
+  - explore more
+
+# 6.29
+
+- have not tried submit + 197 + 196
+
+- today submit
+
+  1. fb3 + dt + 181 + 186 + 187 + 188 + 197 (optim)
+     - [1.4990845648767515, 2.5000698104807086, 3.499945414943945, 4.4996127434483135, 5.509749609049589]
+       - from 0.8591147 to 0.8591752 (+ 0.00006)
+       - LB: 0.823 (lower than original)
+  2. fb3 + dt + 181 + 186 + 187 + 188 + 197 + 196
+     - it give better on f1 score when added 196(cls model)
+     - CV: 0.85777, LB: 0.818
+  3. exp197_4f
+  4. fb3 + dt + 181 + 186 + 187 + 188 + 197 (ns) both vec
+     - CV: , LB: 0.822
+
+- task for tmr
+  - explore nol data lgbm
+  - check on exp94 for non-tokened-text possiblity
+
+# 6.30
+
+- it is pretty clear that using vectorizers is not very good idea due to
+  - limited range of vocabulary
+
+- **exp199**
+  - deberta-v3-large
+  - 2 epoch
+  - [RESULT] 4 folds CV: 0.84483, LB:
+
+- **exp200**
+  - deberta-v3-base
+  - full_text as target_col
+  - [RESULT] 4 folds CV: 0.824406, LB:
+
+- **exp201**
+  - longformer-base
+  - [RESULT] 4 folds CV: 0.82978, LB:
+
+- to maximize dt_count potential
+  - dt_count per paragraph
+  - mean dt_count per paragraph
+  - sum dt_count per parapgraph
+  - not helping very much
+
+- wait for nol_oof
+  - nol_oof not work
+
+- ran out of ideas
+- submit some combinations of models
+
+  1. fb3+dt+181+186+187+188+197+198 (no_vec)
+    - CV: 0.85844, LB: 0.819
+  2. fb3+dt+181+186+187+188+197+199 (no_vec)
+    - CV: 0.85761, LB: 0.820
+  3. fb3+dt+181+186+187+188+197+201 (no_vec)
+    - CV: 0.85719, LB: 0.822
+  4. fb3+dt+181+186+187+188+197+183 (no_vec)
+    - CV: 0.85759, LB: 0.820
+  5. fb3+dt+181+186+187+188+197+193 (no_vec)
+    - CV: 0.85835, LB: 0.821
+
+# 7.1
+
+- last 2 days
+
+>- **exp202**
+>    - roberta-large
+>    - [RESULT] 4 folds CV: 0.8325, LB:
+
+>- **exp203**
+>    - roberta-base
+>    - [RESULT] 4 folds CV: 0.8162, LB:
+
+>- **exp204**
+>    - distilbert-base-uncased
+>    - [RESULT] 4 folds CV: 0.7958, LB:
+
+# 7.2
+
+- last day
+
+- try ensembling didfferent seed of lgbm (just the model)
+
+# 7.3
+- competition ended
+- public 21st/ private 15th
+- gold medal
+
+CV table in markdown format
+| model_num | model_name       | note                      | fold_0  | fold_1  | fold_2  | fold_3  | oof     | public |
+|-----------|------------------|---------------------------|---------|---------|---------|---------|---------|--------|
+| exp181    | deberta-v3-large | huber_loss, lr_decay 0.95 | 0.83637 | 0.84654 | 0.84660 | 0.84487 | 0.84362 | 0.802  |
+| exp186    | deberta-large    |                           | 0.84634 | 0.84623 | 0.85516 | 0.84567 | 0.84839 | 0.797  |
+| exp187    | deberta-v3-large | gem pooling               | 0.84229 | 0.84475 | 0.85143 | 0.84234 | 0.84523 | 0.799  |
+| exp188    | longformer-large |                           | 0.83744 | 0.83544 | 0.84183 | 0.82966 | 0.83610 | 0.798  |
+| exp197    | deberta-base     | attention pooling         | 0.83544 | 0.83634 | 0.84462 | 0.82870 | 0.83633 | 0.804  |
+
+
+# 7.4
+
+- Tried CV strategy of the top winners
+    - pretrain on not-kaggle-only data
+    - finetune with kaggle-only data
+
+- **exp205**
+    - small model
+    - 2 stage training
+    - higher lr on finetune
+    - [RESULT] fold0
+        - CV: 0.79480
+        - LB: 0.78122
+        - PB: 0.79880
+
+- **exp206**
+    - base model
+    - 2 stage training
+    - higher lr on finetune
+        - [RESULT] fold0
+            - CV: 0.79876
+            - LB: 0.77714
+            - PB: 0.79596
+
+    - lower lr on finetune
+        - [RESULT] fold0
+            - CV: 0.79959
+            - LB: 0.78367
+            - PB: 0.80570
+    
+
+- re-calculate the CV of the current rank (15th) 
+    - using kaggle-only: 0.81440
+    - using not-kaggle-only: 0.871564
