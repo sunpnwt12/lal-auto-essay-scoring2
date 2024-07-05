@@ -33,6 +33,10 @@
     - but this is probably better than using spreadsheet or some table
         - because it is easy to add extra detail because of its flexibity
 
+- scheduling
+    - spent so much time on NN train, did not have to explore and create features
+        - having healthy and focused mind should help
+
 - unhealthy
     - pushing too hard on sleep schedule
     - not so much exercise
@@ -68,7 +72,7 @@
     (~13k Persuade essays ("old") and 4.5k unseen ("new") essays in the competition data.)
     Since the new data was clearly using slightly different scoring criteria, I set up my training as a pre-train -> fine-tune, two-staged process. Pre-train on the old data (+ maybe aux data) and fine-tune on the new. This gave a boost of at least 0.015 on public LB and made CV-LB-correlation much better.
     Within each stage I used stratified 5-fold split using prompt_id+score as labels.
-    
+
     risk of using threshold
     1. (over-) fit the targets
     2. correct errors caused by impalanced score labels 
@@ -192,16 +196,54 @@
         optimizer.step()
 ```
 
-## Others
-- thresholds for each prompt_name
-> - I tuned the thresholds directly on public LB. Here is a systematic way to do it.
->    - First set all 5 prompts to [1.5, 2.5, 3.5, 4.5, 5.5]
->    - On first day make 5 submissions. In sub 1 change 1st prompt to [1.6, 2.5, 3.5, 4.5, 5.5]. In sub 2 change 2nd prompt to [1.6, 2.5, 3.5, 4.5, 5.5].
->    - On second day, all subs that improved LB move the threshold more in same direction. All subs that got worse on LB move the thresholds the other way like [1.4, 2.5, 3.5, 4.5, 5.5].
->    - On third day make 5 submissions. In sub 1 change 1st prompt to [1.5, 2.5, 3.5, 4.5, 5.4] etc etc
->    - On fourth day, all subs that improved LB more the threshold more in same direction. All subs that got worse on LB more the thresholds the other way.
+## 6th place solution
 
-> Then on days 5-6 we focus on [1.5, XXX, 3.5, 4.5, 5.5]. And on days 7-8 we focus on [1.5, 2.5, 3.5, XXX, 5.5]. By the end of the week we have LB 0.827 on public LB 🎉
+- [Link](https://www.kaggle.com/competitions/learning-agency-lab-automated-essay-scoring-2/discussion/516814)
+
+- Generated TfidfVectorizer and CountVectorizer base on kaggle-only data
+
+- Transformed NN classifier perdictions from Softmax probability to CDF when stacking
+    - ex. [0.2, 0.2, 0.4, 0.1, 0.09, 0.01] to [0.2, 0.4, 0.8, 0.9, 0.99]
+
+## 8th place solution
+
+- Oversampling kaggle-only data
+
+## Others
+### thresholds for each prompt_name
+    - I tuned the thresholds directly on public LB. Here is a systematic way to do it.
+        - First set all 5 prompts to [1.5, 2.5, 3.5, 4.5, 5.5]
+        - On first day make 5 submissions. In sub 1 change 1st prompt to [1.6, 2.5, 3.5, 4.5, 5.5]. In sub 2 change 2nd prompt to [1.6, 2.5, 3.5, 4.5, 5.5].
+        - On second day, all subs that improved LB move the threshold more in same direction. All subs that got worse on LB move the thresholds the other way like [1.4, 2.5, 3.5, 4.5, 5.5].
+        - On third day make 5 submissions. In sub 1 change 1st prompt to [1.5, 2.5, 3.5, 4.5, 5.4] etc etc
+        - On fourth day, all subs that improved LB more the threshold more in same direction. All subs that got worse on LB more the thresholds the other way.
+
+    Then on days 5-6 we focus on [1.5, XXX, 3.5, 4.5, 5.5]. And on days 7-8 we focus on [1.5, 2.5, 3.5, XXX, 5.5]. By the end of the week we have LB 0.827 on public LB 🎉
+
+### Features
+
+- discourse type as vectors
+    - turn to vectors of discourse type
+
+- Questions mark features
+    - in each paragraph, sentences, words (max, min, mean, ...)
+
+- Referencing quote features
+    - percentage of it against the whole essay
+
+- unique words in paragraph and sentence
+
+- CountVectorizer both word and characters
+
+- prediction from LGBMClassifier
+
+### Discoveries
+
+- In the cowboys topic, there were conversion between characters
+    - this is mabye why this topic got lower score in training when compared to others
+
+- Some lengthy essays are just using repeatedly some kind of sentence
+    - which make them got lower score
 
 # What I should do for my next competitions
 
@@ -216,3 +258,11 @@
 
 - exploring more, learn more about similarity between LB and CV
 
+- As reading winners solution, I felt like my hyparameter was not the optimal one
+    - CV is too low for the even with extra boost from discourse type
+
+- spend time learning more about tree-based model
+
+- analyzing predictions more deeply
+    - distribution
+    - fasle positives / false negativeS

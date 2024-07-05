@@ -10,5 +10,8 @@ wheels/
 .venv
 
 /pipeline_example
-/exp
-data/train_df_with_prompt.csv
+/exp_models
+/exp_others
+/data
+eff_full_xsmall.zip
+fb3_eff_full_xsmall.zip
