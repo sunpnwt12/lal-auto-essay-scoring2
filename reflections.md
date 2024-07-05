@@ -196,6 +196,12 @@
         optimizer.step()
 ```
 
+## 5h place solution
+
+    1. Split Kaggle-only data (5 prompts) using StratefiedKFold into kaggle-only-train and kaggle-only-valid.
+    2. Finetune (not MLM) deberta models (small/base/large) on persuade2.0 data (7 prompts) + kaggle-only-train.
+    3. Load the weights from previous step and train on kaggle-only-train and validation on kaggle-only-valid.
+
 ## 6th place solution
 
 - [Link](https://www.kaggle.com/competitions/learning-agency-lab-automated-essay-scoring-2/discussion/516814)
@@ -266,3 +272,5 @@
 - analyzing predictions more deeply
     - distribution
     - fasle positives / false negativeS
+
+- have not down LightGBM hyparameter tunning
