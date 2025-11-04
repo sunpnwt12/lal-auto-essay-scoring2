@@ -10,7 +10,7 @@ dependencies = [
     "pandas>=2.2.2",
     "matplotlib>=3.8.4",
     "torch>=2.3.0",
-    "transformers==4.39.3",
+    "transformers>=4.48.0",
     "scikit-learn>=1.4.2",
     "lightgbm>=4.3.0",
     "pyspellchecker>=0.8.1",
